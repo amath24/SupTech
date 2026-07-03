@@ -1,0 +1,30 @@
+# Fichiers screen/images
+**/screen.png
+**/screen.jpg
+**/screen.jpeg
+**/screen.gif
+**/screen.webp
+**/screenshots/
+
+.env
+.env.local
+
+# IDE et éditeurs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Fichiers système
+Thumbs.db
+.cache/
+
+# Dépendances (si applicable)
+/vendor/
+node_modules/
+
+# Fichiers temporaires
+*.tmp
+*.log
