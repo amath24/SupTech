@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gestion des paiements - Mamadou Diallo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "secondary": "#006c49",
+                        "inverse-primary": "#b6c4ff",
+                        "on-tertiary-container": "#ff8f4f",
+                        "on-background": "#0b1c30",
+                        "on-tertiary-fixed": "#341100",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#90a8ff",
+                        "primary": "#00236f",
+                        "background": "#f8f9ff",
+                        "surface-variant": "#d3e4fe",
+                        "on-secondary-container": "#00714d",
+                        "surface": "#f8f9ff",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#4edea3",
+                        "on-surface": "#0b1c30",
+                        "outline": "#757682",
+                        "inverse-surface": "#213145",
+                        "on-primary-fixed-variant": "#264191",
+                        "tertiary-fixed": "#ffdbca",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#f8f9ff",
+                        "secondary-fixed": "#6ffbbe",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "surface-container": "#e5eeff",
+                        "tertiary-container": "#6e2d00",
+                        "tertiary": "#4b1c00",
+                        "on-primary-fixed": "#00164e",
+                        "tertiary-fixed-dim": "#ffb690",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#4059aa",
+                        "outline-variant": "#c5c5d3",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-container-low": "#eff4ff",
+                        "on-surface-variant": "#444651",
+                        "primary-fixed": "#dce1ff",
+                        "on-tertiary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#002113",
+                        "secondary-container": "#6cf8bb",
+                        "primary-container": "#1e3a8a",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#dce9ff",
+                        "on-secondary-fixed-variant": "#005236",
+                        "on-tertiary-fixed-variant": "#783200",
+                        "surface-dim": "#cbdbf5",
+                        "surface-container-highest": "#d3e4fe"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "header-height": "72px",
+                        "card-gap": "1rem",
+                        "sidebar-width": "280px",
+                        "gutter": "1.5rem",
+                        "container-padding": "2rem"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "sidebar-link": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "title-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "sidebar-link": ["15px", { "lineHeight": "24px", "fontWeight": "500" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "title-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased h-screen overflow-hidden flex">
+<!-- SideNavBar -->
+<nav class="hidden md:flex bg-primary dark:bg-primary text-on-primary dark:text-on-primary font-sidebar-link text-sidebar-link fixed left-0 top-0 h-screen w-sidebar-width border-r border-outline-variant shadow-sm flex flex-col h-full overflow-y-auto z-50">
+<div class="p-6 flex flex-col items-center border-b border-on-primary/10">
+<img alt="Logo de l'Institut" class="h-12 w-auto mb-4 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLtzoZ2rcpMxMScovgaHRyc7GYXZ38veD2Icj5ryxozctkkqhQgiVxtyGP3X3oUVUx665NG_e-7F3cQxWJFoxm1DxKC5kz597JAPjIPkOFtdvQDvcXzFYjRi8-_UOKz5efA5xZSUR1zHF0CH5X1b3PY-vwvhMFhMN31PMuQEjmDm4yCbDlIy5zpvq0CLObjS7CwKt7pLVkeKKXzNt4faSKXdsdR-dQRaclSR4QH20G7KZxp76JlG1XnWbi24"/>
+<h1 class="text-title-sm font-title-sm text-on-primary">ISM Management</h1>
+<p class="text-body-sm font-body-sm text-on-primary/70">Portail Administratif</p>
+</div>
+<div class="flex-1 py-4 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:bg-on-primary/5 hover:bg-on-primary/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:bg-on-primary/5 hover:bg-on-primary/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">groups</span>
+                Étudiants
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:bg-on-primary/5 hover:bg-on-primary/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">school</span>
+                Enseignants
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:bg-on-primary/5 hover:bg-on-primary/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">class</span>
+                Classes
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:bg-on-primary/5 hover:bg-on-primary/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">book</span>
+                Modules
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:bg-on-primary/5 hover:bg-on-primary/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">person_add</span>
+                Inscriptions
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 border-l-4 border-secondary-fixed bg-on-primary/10 text-on-primary font-bold opacity-90 transition-all" href="#">
+<span class="material-symbols-outlined">payments</span>
+                Paiements
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:bg-on-primary/5 hover:bg-on-primary/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">description</span>
+                Notes
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:bg-on-primary/5 hover:bg-on-primary/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+                Emploi du temps
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:bg-on-primary/5 hover:bg-on-primary/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">query_stats</span>
+                Statistiques
+            </a>
+</div>
+<div class="p-4 border-t border-on-primary/10 mt-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:bg-on-primary/5 hover:bg-on-primary/10 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">logout</span>
+                Déconnexion
+            </a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col md:ml-sidebar-width h-screen overflow-hidden">
+<!-- TopNavBar -->
+<header class="hidden md:flex bg-surface-container-lowest dark:bg-surface-container-lowest text-on-surface dark:text-on-surface font-body-md text-body-md fixed top-0 right-0 w-[calc(100%-theme(spacing.sidebar-width))] h-header-height border-b border-outline-variant shadow-sm flex justify-between items-center px-gutter h-full w-full z-40">
+<div class="flex-1 flex items-center">
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="Rechercher..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-variant/50 transition-colors rounded-full relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<div class="flex items-center gap-3 pl-4 border-l border-outline-variant">
+<div class="text-right hidden lg:block">
+<p class="font-title-sm text-title-sm text-on-surface">Aminata Sow</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Profil Utilisateur</p>
+</div>
+<img class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="Portrait d'une administratrice sénégalaise professionnelle, souriante, portant des lunettes et une tenue de bureau élégante, éclairage studio doux, fond neutre." src="https://lh3.googleusercontent.com/aida-public/AB6AXuChaulKzVFKwIkq3zko0KYo1_uneuNB88S79WCrl4JS-MIP0Lw_iTFVKitkdiUOYfMj1r1Xz-vZC1v3_txQvxJoK15NZzDRO9An02EsPNYuL2VLgAGHWGY9XMRAVtd6w51Os7rXuVFBWrAJbfs5a_R5ASU8iNGZKWBNrMnzm9FCeuY26Zn5fxwuYTclV1t7J58rC4TvM82GcAEWDc5bFcsOnwh9lyBqsbJ92ZBGKep-Fivyj5Q9qBaVqg"/>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<main class="flex-1 overflow-y-auto mt-header-height p-container-padding bg-background">
+<div class="max-w-7xl mx-auto">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+<div>
+<h2 class="font-display-lg text-display-lg text-on-background">Mamadou Diallo</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">badge</span> Matricule: ETD-2023-0145 
+                            <span class="material-symbols-outlined text-sm ml-2">school</span> Licence 3 - Finance
+                        </p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface border border-outline-variant text-on-surface rounded-md font-sidebar-link hover:bg-surface-variant/50 transition-colors hover:-translate-y-0.5 duration-200">
+<span class="material-symbols-outlined text-outline">print</span>
+                            Imprimer le reçu
+                        </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-md font-sidebar-link shadow-sm hover:bg-primary-fixed-variant transition-colors hover:-translate-y-0.5 duration-200">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+                            Ajouter un paiement
+                        </button>
+</div>
+</div>
+<!-- Financial Summary Cards (Bento style) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-card-gap mb-8">
+<!-- Total -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-6 shadow-sm hover:-translate-y-1 transition-transform duration-200">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-title-sm text-title-sm text-on-surface-variant">Scolarité annuelle</h3>
+<span class="material-symbols-outlined text-primary bg-primary-container/10 p-2 rounded-full">account_balance</span>
+</div>
+<p class="font-display-lg text-display-lg text-on-background">500 000 <span class="text-title-sm font-title-sm text-outline">FCFA</span></p>
+<div class="w-full bg-surface-container-high h-2 rounded-full mt-4">
+<div class="bg-primary h-2 rounded-full w-full"></div>
+</div>
+</div>
+<!-- Paid -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-6 shadow-sm hover:-translate-y-1 transition-transform duration-200 relative overflow-hidden">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-secondary/5 rounded-full blur-xl"></div>
+<div class="flex items-center justify-between mb-4 relative z-10">
+<h3 class="font-title-sm text-title-sm text-on-surface-variant">Montant payé</h3>
+<span class="material-symbols-outlined text-secondary bg-secondary-container p-2 rounded-full">check_circle</span>
+</div>
+<p class="font-display-lg text-display-lg text-secondary relative z-10">250 000 <span class="text-title-sm font-title-sm">FCFA</span></p>
+<div class="w-full bg-surface-container-high h-2 rounded-full mt-4 relative z-10">
+<div class="bg-secondary h-2 rounded-full w-1/2"></div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-2 relative z-10">50% réglé</p>
+</div>
+<!-- Remaining -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-6 shadow-sm hover:-translate-y-1 transition-transform duration-200 relative overflow-hidden">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-on-tertiary-container/10 rounded-full blur-xl"></div>
+<div class="flex items-center justify-between mb-4 relative z-10">
+<h3 class="font-title-sm text-title-sm text-on-surface-variant">Reste à payer</h3>
+<span class="material-symbols-outlined text-on-tertiary-container bg-tertiary-fixed p-2 rounded-full">pending_actions</span>
+</div>
+<p class="font-display-lg text-display-lg text-on-tertiary-container relative z-10">250 000 <span class="text-title-sm font-title-sm">FCFA</span></p>
+<div class="w-full bg-surface-container-high h-2 rounded-full mt-4 relative z-10">
+<div class="bg-on-tertiary-container h-2 rounded-full w-1/2"></div>
+</div>
+<p class="font-body-sm text-body-sm text-error mt-2 flex items-center gap-1 relative z-10">
+<span class="material-symbols-outlined text-sm">warning</span> Échéance: 15 Mars 2024
+                        </p>
+</div>
+</div>
+<!-- Payment History Table -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg shadow-sm overflow-hidden">
+<div class="p-4 border-b border-outline-variant flex justify-between items-center bg-surface">
+<h3 class="font-headline-md text-headline-md text-on-background">Historique des paiements</h3>
+<button class="text-primary hover:text-on-primary-fixed-variant transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low font-label-caps text-label-caps text-on-surface-variant">
+<th class="p-4 border-b border-outline-variant">Date</th>
+<th class="p-4 border-b border-outline-variant">Référence</th>
+<th class="p-4 border-b border-outline-variant">Mode</th>
+<th class="p-4 border-b border-outline-variant">Motif</th>
+<th class="p-4 border-b border-outline-variant text-right">Montant</th>
+<th class="p-4 border-b border-outline-variant text-center">Statut</th>
+<th class="p-4 border-b border-outline-variant text-center">Actions</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md text-on-background">
+<!-- Row 1 -->
+<tr class="border-b border-outline-variant hover:bg-surface-container-low transition-colors group cursor-pointer">
+<td class="p-4">12 Nov 2023</td>
+<td class="p-4 font-sidebar-link text-sidebar-link text-primary">TRX-9824-A</td>
+<td class="p-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-sm">account_balance_wallet</span> Espèces
+                                    </td>
+<td class="p-4">Mensualité 1 &amp; 2</td>
+<td class="p-4 text-right font-sidebar-link text-sidebar-link">150 000 FCFA</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary-container text-on-secondary-fixed">
+                                            Validé
+                                        </span>
+</td>
+<td class="p-4 text-center text-outline group-hover:text-primary transition-colors">
+<button class="p-1 hover:bg-surface-variant rounded"><span class="material-symbols-outlined text-sm">receipt_long</span></button>
+<button class="p-1 hover:bg-surface-variant rounded"><span class="material-symbols-outlined text-sm">edit</span></button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="border-b border-outline-variant hover:bg-surface-container-low transition-colors group cursor-pointer">
+<td class="p-4">05 Sep 2023</td>
+<td class="p-4 font-sidebar-link text-sidebar-link text-primary">TRX-8102-B</td>
+<td class="p-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-sm">credit_card</span> Chèque
+                                    </td>
+<td class="p-4">Frais d'inscription</td>
+<td class="p-4 text-right font-sidebar-link text-sidebar-link">100 000 FCFA</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary-container text-on-secondary-fixed">
+                                            Validé
+                                        </span>
+</td>
+<td class="p-4 text-center text-outline group-hover:text-primary transition-colors">
+<button class="p-1 hover:bg-surface-variant rounded"><span class="material-symbols-outlined text-sm">receipt_long</span></button>
+<button class="p-1 hover:bg-surface-variant rounded"><span class="material-symbols-outlined text-sm">edit</span></button>
+</td>
+</tr>
+<!-- Row 3 (Empty State representation) -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="p-8 text-center text-on-surface-variant" colspan="7">
+<span class="material-symbols-outlined text-4xl mb-2 text-outline-variant">history</span>
+<p class="font-body-md text-body-md">Fin de l'historique des transactions.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
