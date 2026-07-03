@@ -1,10 +1,15 @@
 <?php
+session_start();
+
 require_once __DIR__ . '/include/config.php';
 
 $pageTitle = 'Connexion';
 $layout = 'login';
 
 $logoUrl = 'https://lh3.googleusercontent.com/aida/AP1WRLtzoZ2rcpMxMScovgaHRyc7GYXZ38veD2Icj5ryxozctkkqhQgiVxtyGP3X3oUVUx665NG_e-7F3cQxWJFoxm1DxKC5kz597JAPjIPkOFtdvQDvcXzFYjRi8-_UOKz5efA5xZSUR1zHF0CH5X1b3PY-vwvhMFhMN31PMuQEjmDm4yCbDlIy5zpvq0CLObjS7CwKt7pLVkeKKXzNt4faSKXdsdR-dQRaclSR4QH20G7KZxp76JlG1XnWbi24';
+
+// Récupérer le message d'erreur s'il existe
+$error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
 
 require_once __DIR__ . '/include/head.php';
 ?>
@@ -16,7 +21,18 @@ require_once __DIR__ . '/include/head.php';
             <p class="login-subtitle">Gestion Académique</p>
         </header>
 
-        <form action="<?= url('dashboard/dashboard.php') ?>" method="POST" class="d-flex flex-column gap-3">
+        <?php if (!empty($error)): ?>
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
+            <span class="material-symbols-outlined">error</span>
+            <div>
+                <strong>Erreur de connexion</strong>
+                <p class="mb-0 small"><?= htmlspecialchars($error) ?></p>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        </div>
+        <?php endif; ?>
+
+        <form action="<?= url('include/login_handler.php') ?>" method="POST" class="d-flex flex-column gap-3">
             <div>
                 <label for="email" class="form-label fw-semibold small">Adresse Email</label>
                 <div class="input-icon-group">
