@@ -1,12 +1,12 @@
 <?php
-require_once __DIR__ . '/../include/config.php';
-
+$page_required_role = 'Scolarité';
+require_once __DIR__ . '/../include/auth_check.php';
+require_once __DIR__ . '/../include/config/database.php';
 $pageTitle = 'Gestion des Inscriptions';
 $activePage = 'inscriptions';
 $userName = 'Admin Principal';
-$userRole = 'Secrétariat';
+$userRole = 'Scolarité';
 $userInitials = 'A';
-
 require_once __DIR__ . '/../include/head.php';
 ?>
 <body>

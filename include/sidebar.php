@@ -32,7 +32,7 @@ $logoUrl = 'https://lh3.googleusercontent.com/aida/AP1WRLtzoZ2rcpMxMScovgaHRyc7G
     </nav>
 
     <div class="sidebar-footer">
-        <a href="<?= url('index.php') ?>" class="nav-link sidebar-link sidebar-logout">
+        <a href="<?= url('logout.php') ?>" class="nav-link sidebar-link sidebar-logout">
             <span class="material-symbols-outlined">logout</span>
             <span>Déconnexion</span>
         </a>

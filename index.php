@@ -20,17 +20,12 @@ require_once __DIR__ . '/include/head.php';
             <h1 class="login-title">SupTech Business School</h1>
             <p class="login-subtitle">Gestion Académique</p>
         </header>
-
-        <?php if (!empty($error)): ?>
-        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
-            <span class="material-symbols-outlined">error</span>
-            <div>
-                <strong>Erreur de connexion</strong>
-                <p class="mb-0 small"><?= htmlspecialchars($error) ?></p>
-            </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-        </div>
-        <?php endif; ?>
+<?php if (isset($_SESSION['error'])): ?>
+    <div class="alert alert-danger text-center small p-2 mb-3" style="color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px;">
+        <?= $_SESSION['error']; ?>
+        <?php unset($_SESSION['error']); // On efface le message après affichage ?>
+    </div>
+<?php endif; ?>
 
         <form action="<?= url('include/login_handler.php') ?>" method="POST" class="d-flex flex-column gap-3">
             <div>

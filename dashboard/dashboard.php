@@ -1,12 +1,14 @@
 <?php
+$page_required_role = 'Administrateur';
+require_once __DIR__ . '/../include/auth_check.php';
 require_once __DIR__ . '/../include/config.php';
 
 $pageTitle = 'Tableau de bord';
 $activePage = 'dashboard';
 
-// Données de session (simulées pour maintenant)
-$userName = $_SESSION['user_nom'] ?? 'Cheikh Diop';
-$userRole = $_SESSION['user_role'] ?? 'Administrateur';
+// Données de session )
+$userName = $_SESSION['user_nom'] ?? '';
+$userRole = $_SESSION['user_role'] ?? '';
 $userInitials = strtoupper(substr($_SESSION['user_nom'] ?? 'C', 0, 1));
 
 require_once __DIR__ . '/../include/head.php';

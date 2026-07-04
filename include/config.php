@@ -1,8 +1,12 @@
 <?php
+// Démarrer la session en toute sécurité si elle n'est pas déjà active
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 /**
  * Configuration globale SupTech
  */
-
 define('APP_NAME', 'ISM Management');
 define('APP_SUBTITLE', 'Portail Administratif');
 define('BASE_PATH', dirname(__DIR__));
@@ -29,16 +33,48 @@ function url(string $path): string
  */
 function getMenuItems(): array
 {
-    return [
-        ['id' => 'dashboard',       'label' => 'Dashboard',        'icon' => 'dashboard',       'url' => url('dashboard/dashboard.php')],
-        ['id' => 'etudiants',       'label' => 'Étudiants',        'icon' => 'groups',          'url' => url('gestion_des_etudiants/gestiondesetudiant.php')],
-        ['id' => 'enseignants',     'label' => 'Enseignants',      'icon' => 'school',          'url' => url('gestion_des_enseignants/gestiondesenseignants.php')],
-        ['id' => 'classes',         'label' => 'Classes',          'icon' => 'class',           'url' => url('gestion_des_classes/gestiondesclasse.php')],
-        ['id' => 'modules',         'label' => 'Modules',          'icon' => 'book',            'url' => url('gestion_des_modules/gestiondesmodule.php')],
-        ['id' => 'inscriptions',    'label' => 'Inscriptions',     'icon' => 'person_add',      'url' => url('gestion_des_inscriptions/gestiondesinscription.php')],
-        ['id' => 'paiements',       'label' => 'Paiements',        'icon' => 'payments',        'url' => url('gestion_des_paiements/gestiondes paiements.php')],
-        ['id' => 'notes',           'label' => 'Notes',            'icon' => 'description',     'url' => url('gestion_des_notes_enseignant/gestiondesnote.php')],
-        ['id' => 'emploi_du_temps', 'label' => 'Emploi du temps',  'icon' => 'calendar_today',  'url' => url('emploi_du_temps/emploi_du_temps.php')],
-        ['id' => 'statistiques',    'label' => 'Statistiques',     'icon' => 'query_stats',     'url' => '#'],
-    ];
+    $role = strtolower(trim($_SESSION['user_role'] ?? ''));
+    $items = [];
+
+    // =========================================================
+    // MENU ADMINISTRATEUR : Accès total
+    // =========================================================
+    if ($role === 'administrateur') {
+        $items = [
+            ['id' => 'dashboard',       'label' => 'Dashboard',        'icon' => 'dashboard',       'url' => url('dashboard/dashboard.php')],
+            ['id' => 'etudiants',       'label' => 'Étudiants',        'icon' => 'groups',          'url' => url('gestion_des_etudiants/gestiondesetudiant.php')],
+            ['id' => 'enseignants',     'label' => 'Enseignants',      'icon' => 'school',          'url' => url('gestion_des_enseignants/gestiondesenseignants.php')],
+            ['id' => 'classes',         'label' => 'Classes',          'icon' => 'class',           'url' => url('gestion_des_classes/gestiondesclasse.php')],
+            ['id' => 'modules',         'label' => 'Modules',          'icon' => 'book',            'url' => url('gestion_des_modules/gestiondesmodule.php')],
+            ['id' => 'inscriptions',    'label' => 'Inscriptions',     'icon' => 'person_add',      'url' => url('gestion_des_inscriptions/gestiondesinscription.php')],
+            ['id' => 'paiements',       'label' => 'Paiements',        'icon' => 'payments',        'url' => url('gestion_des_paiements/gestiondespaiements.php')],
+            ['id' => 'notes',           'label' => 'Notes',            'icon' => 'description',     'url' => url('gestion_des_notes_enseignant/gestiondesnote.php')],
+            ['id' => 'emploi_du_temps', 'label' => 'Emploi du temps',  'icon' => 'calendar_today',  'url' => url('emploi_du_temps/emploi_du_temps.php')],
+            ['id' => 'statistiques',    'label' => 'Statistiques',     'icon' => 'query_stats',     'url' => '#'],
+        ];
+    }
+    // =========================================================
+    // MENU ENSEIGNANT : Périmètre pédagogique
+    // =========================================================
+    elseif ($role === 'enseignant') {
+        $items = [
+            ['id' => 'modules',         'label' => 'Mes Modules',      'icon' => 'book',            'url' => url('gestion_des_modules/gestiondesmodule.php')],
+            ['id' => 'notes',           'label' => 'Saisie des Notes', 'icon' => 'description',     'url' => url('gestion_des_notes_enseignant/gestiondesnote.php')],
+            ['id' => 'emploi_du_temps', 'label' => 'Mon Emploi du temps','icon' => 'calendar_today',  'url' => url('emploi_du_temps/emploi_du_temps.php')],
+        ];
+    }
+    // =========================================================
+    // MENU SCOLARITÉ : Périmètre administratif et financier
+    // =========================================================
+    elseif ($role === 'scolarité' || $role === 'scolarite') {
+        $items = [
+            ['id' => 'etudiants',       'label' => 'Étudiants',        'icon' => 'groups',          'url' => url('gestion_des_etudiants/gestiondesetudiant.php')],
+            ['id' => 'classes',         'label' => 'Classes',          'icon' => 'class',           'url' => url('gestion_des_classes/gestiondesclasse.php')],
+            ['id' => 'inscriptions',    'label' => 'Inscriptions',     'icon' => 'person_add',      'url' => url('gestion_des_inscriptions/gestiondesinscription.php')],
+            ['id' => 'paiements',       'label' => 'Paiements',        'icon' => 'payments',        'url' => url('gestion_des_paiements/gestiondespaiements.php')],
+            ['id' => 'emploi_du_temps', 'label' => 'Emploi du temps',  'icon' => 'calendar_today',  'url' => url('emploi_du_temps/emploi_du_temps.php')],
+        ];
+    }
+
+    return $items;
 }

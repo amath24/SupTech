@@ -61,22 +61,24 @@ try {
     // 6. Redirection selon le rôle
     $role = strtolower(trim($user['role']));
 
-    switch ($role) {
-        case 'administrateur':
-            header('Location: ' . url('dashboard/dashboard.php'));
-            break;
-        case 'enseignant':
-            header('Location: ' . url('gestion_des_modules/gestiondesmodule.php'));
-            break;
-        case 'étudiant':
-            header('Location: ' . url('gestion_des_inscriptions/gestiondesinscription.php'));
-            break;
-        default:
-            header('Location: ' . url('dashboard/dashboard.php'));
-            break;
-    }
-    exit;
-
+ switch ($role) {
+    case 'administrateur':
+        header('Location: ' . url('dashboard/dashboard.php'));
+        break;
+    case 'enseignant':
+        // Redirection spécifique, pas vers le dashboard admin
+        header('Location: ' . url('gestion_des_modules/gestiondesmodule.php'));
+        break;
+    // ...
+case 'scolarité':
+    header('Location: ' . url('gestion_des_inscriptions/gestiondesinscription.php'));
+    break;
+// ...
+    default:
+        // Si aucun rôle trouvé, on déconnecte
+        header('Location: ' . url('logout.php'));
+        break;
+}
 } catch (PDOException $e) {
     $_SESSION['error'] = 'Erreur serveur. Veuillez réessayer plus tard.';
     error_log('Erreur Connexion: ' . $e->getMessage());
