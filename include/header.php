@@ -12,13 +12,16 @@ $userInitials = $userInitials ?? 'AP';
         <button id="sidebarToggle" class="btn btn-icon d-md-none me-2" type="button" aria-label="Menu">
             <span class="material-symbols-outlined">menu</span>
         </button>
-        <div class="header-search">
-            <span class="material-symbols-outlined search-icon">search</span>
-            <input type="text" class="form-control" placeholder="Rechercher..." aria-label="Rechercher">
-        </div>
+
     </div>
 
     <div class="header-actions">
+        <!-- Theme Toggle -->
+        <button id="themeToggle" class="btn btn-icon" type="button" aria-label="Changer de thème">
+            <span class="material-symbols-outlined theme-icon-light d-none">light_mode</span>
+            <span class="material-symbols-outlined theme-icon-dark">dark_mode</span>
+        </button>
+        
         <button class="btn btn-icon position-relative" type="button" aria-label="Notifications">
             <span class="material-symbols-outlined">notifications</span>
             <span class="notification-dot"></span>

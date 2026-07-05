@@ -24,12 +24,33 @@ $user_role = strtolower(trim($_SESSION['user_role']));
 // (Si c'est un administrateur, cette condition est ignorée et il passe librement)
 if (isset($page_required_role) && $user_role !== 'administrateur') {
     
-    $required_role = strtolower(trim($page_required_role));
+    $is_authorized = false;
 
-    // Si le rôle de l'utilisateur ne correspond pas au rôle exigé par la page
-    if ($user_role !== $required_role) {
+    // A. Si la page autorise PLUSIEURS rôles (Tableau)
+    if (is_array($page_required_role)) {
+        // On nettoie et met en minuscules chaque rôle du tableau
+        $required_roles = array_map(function($role) {
+            return strtolower(trim($role));
+        }, $page_required_role);
+        
+        // On vérifie si le rôle de l'utilisateur est dans le tableau
+        if (in_array($user_role, $required_roles)) {
+            $is_authorized = true;
+        }
+    } 
+    // B. Si la page autorise un SEUL rôle (Chaîne de caractères)
+    else {
+        $required_role = strtolower(trim($page_required_role));
+        if ($user_role === $required_role) {
+            $is_authorized = true;
+        }
+    }
+
+    // 3. Si l'utilisateur n'a pas reçu l'autorisation après les vérifications
+    if (!$is_authorized) {
         $_SESSION['error'] = "Accès refusé : cette zone est réservée.";
         header('Location: ' . url('index.php'));
         exit;
     }
 }
+?>

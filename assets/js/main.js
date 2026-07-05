@@ -99,4 +99,36 @@ document.addEventListener('DOMContentLoaded', function () {
                 type === 'password' ? 'visibility' : 'visibility_off';
         });
     }
+
+    // Gestion du thème sombre (Dark Mode)
+    const themeToggleBtn = document.getElementById('themeToggle');
+    if (themeToggleBtn) {
+        const iconLight = themeToggleBtn.querySelector('.theme-icon-light');
+        const iconDark = themeToggleBtn.querySelector('.theme-icon-dark');
+
+        // Mettre à jour l'icône selon le thème actuel
+        const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+        if (currentTheme === 'dark') {
+            iconDark.classList.add('d-none');
+            iconLight.classList.remove('d-none');
+        } else {
+            iconLight.classList.add('d-none');
+            iconDark.classList.remove('d-none');
+        }
+
+        themeToggleBtn.addEventListener('click', function () {
+            const html = document.documentElement;
+            const newTheme = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+
+            if (newTheme === 'dark') {
+                iconDark.classList.add('d-none');
+                iconLight.classList.remove('d-none');
+            } else {
+                iconLight.classList.add('d-none');
+                iconDark.classList.remove('d-none');
+            }
+        });
+    }
 });

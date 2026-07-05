@@ -45,6 +45,7 @@ function getMenuItems(): array
             ['id' => 'etudiants',       'label' => 'Étudiants',        'icon' => 'groups',          'url' => url('gestion_des_etudiants/gestiondesetudiant.php')],
             ['id' => 'enseignants',     'label' => 'Enseignants',      'icon' => 'school',          'url' => url('gestion_des_enseignants/gestiondesenseignants.php')],
             ['id' => 'classes',         'label' => 'Classes',          'icon' => 'class',           'url' => url('gestion_des_classes/gestiondesclasse.php')],
+            ['id' => 'salles',          'label' => 'Salles',           'icon' => 'meeting_room',    'url' => url('gestion_des_salle/gestiondessalle.php')],
             ['id' => 'modules',         'label' => 'Modules',          'icon' => 'book',            'url' => url('gestion_des_modules/gestiondesmodule.php')],
             ['id' => 'inscriptions',    'label' => 'Inscriptions',     'icon' => 'person_add',      'url' => url('gestion_des_inscriptions/gestiondesinscription.php')],
             ['id' => 'paiements',       'label' => 'Paiements',        'icon' => 'payments',        'url' => url('gestion_des_paiements/gestiondespaiements.php')],
@@ -58,7 +59,6 @@ function getMenuItems(): array
     // =========================================================
     elseif ($role === 'enseignant') {
         $items = [
-            ['id' => 'modules',         'label' => 'Mes Modules',      'icon' => 'book',            'url' => url('gestion_des_modules/gestiondesmodule.php')],
             ['id' => 'notes',           'label' => 'Saisie des Notes', 'icon' => 'description',     'url' => url('gestion_des_notes_enseignant/gestiondesnote.php')],
             ['id' => 'emploi_du_temps', 'label' => 'Mon Emploi du temps','icon' => 'calendar_today',  'url' => url('emploi_du_temps/emploi_du_temps.php')],
         ];
@@ -69,7 +69,9 @@ function getMenuItems(): array
     elseif ($role === 'scolarité' || $role === 'scolarite') {
         $items = [
             ['id' => 'etudiants',       'label' => 'Étudiants',        'icon' => 'groups',          'url' => url('gestion_des_etudiants/gestiondesetudiant.php')],
+            ['id' => 'modules',         'label' => 'Mes Modules',      'icon' => 'book',            'url' => url('gestion_des_modules/gestiondesmodule.php')],
             ['id' => 'classes',         'label' => 'Classes',          'icon' => 'class',           'url' => url('gestion_des_classes/gestiondesclasse.php')],
+            ['id' => 'salles',          'label' => 'Salles',           'icon' => 'meeting_room',    'url' => url('gestion_des_salle/gestiondessalle.php')],
             ['id' => 'inscriptions',    'label' => 'Inscriptions',     'icon' => 'person_add',      'url' => url('gestion_des_inscriptions/gestiondesinscription.php')],
             ['id' => 'paiements',       'label' => 'Paiements',        'icon' => 'payments',        'url' => url('gestion_des_paiements/gestiondespaiements.php')],
             ['id' => 'emploi_du_temps', 'label' => 'Emploi du temps',  'icon' => 'calendar_today',  'url' => url('emploi_du_temps/emploi_du_temps.php')],

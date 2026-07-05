@@ -2,17 +2,87 @@
 $page_required_role = 'Administrateur';
 require_once __DIR__ . '/../include/auth_check.php';
 require_once __DIR__ . '/../include/config.php';
+require_once __DIR__ . '/../include/config/database.php';
 
 $pageTitle = 'Tableau de bord';
 $activePage = 'dashboard';
 
-// Données de session )
+// Données de session
 $userName = $_SESSION['user_nom'] ?? '';
-$userRole = $_SESSION['user_role'] ?? '';
-$userInitials = strtoupper(substr($_SESSION['user_nom'] ?? 'C', 0, 1));
+
+$db = Database::getInstance();
+
+// 1. Statistiques KPIs
+$totalEtudiants = $db->query("SELECT COUNT(*) FROM etudiants")->fetchColumn();
+$totalEnseignants = $db->query("SELECT COUNT(*) FROM enseignants")->fetchColumn();
+
+// Total des inscriptions pour l'année courante (celle avec le libelle le plus récent)
+$anneeCouranteId = $db->query("SELECT id_annee FROM annees_universitaires ORDER BY date_debut DESC LIMIT 1")->fetchColumn();
+$totalInscriptions = $db->prepare("SELECT COUNT(*) FROM inscriptions WHERE id_annee = ?");
+$totalInscriptions->execute([$anneeCouranteId]);
+$totalInscriptions = $totalInscriptions->fetchColumn();
+
+// Taux de réussite (Simulé comme demandé)
+$tauxReussite = 78;
+
+// 2. Données pour le graphique des paiements mensuels (Année en cours)
+// On récupère la somme des paiements groupée par mois
+$stmtPaiements = $db->query("
+    SELECT DATE_FORMAT(date_paiement, '%Y-%m') as mois, SUM(montant_paye) as total
+    FROM paiements
+    WHERE YEAR(date_paiement) = YEAR(CURDATE())
+    GROUP BY DATE_FORMAT(date_paiement, '%Y-%m')
+    ORDER BY mois ASC
+");
+$paiementsMensuels = $stmtPaiements->fetchAll();
+
+$moisLibelles = [];
+$paiementsData = [];
+$moisNoms = ['01' => 'JAN', '02' => 'FEV', '03' => 'MAR', '04' => 'AVR', '05' => 'MAI', '06' => 'JUIN', '07' => 'JUIL', '08' => 'AOU', '09' => 'SEP', '10' => 'OCT', '11' => 'NOV', '12' => 'DEC'];
+
+foreach ($paiementsMensuels as $pm) {
+    $moisSplit = explode('-', $pm['mois']);
+    $moisLibelles[] = $moisNoms[$moisSplit[1]];
+    $paiementsData[] = $pm['total'];
+}
+
+// 3. Données pour le graphique de répartition par classe
+$stmtClasses = $db->query("
+    SELECT c.nom as classe, c.id_classe, COUNT(i.id_inscription) as nb
+    FROM inscriptions i
+    JOIN classes c ON i.id_classe = c.id_classe
+    WHERE i.id_annee = " . intval($anneeCouranteId) . "
+    GROUP BY c.id_classe
+    ORDER BY nb DESC
+");
+$repartitionClasses = $stmtClasses->fetchAll();
+
+$classesLabels = [];
+$classesData = [];
+$classesColors = ['#00236f', '#006c49', '#4b1c00', '#005236', '#1e3a8a', '#ffb593']; // Palette SupTech
+$i = 0;
+foreach ($repartitionClasses as $rc) {
+    $classesLabels[] = $rc['classe'];
+    $classesData[] = $rc['nb'];
+}
+
+// 4. Derniers étudiants inscrits
+$stmtDerniersInscrits = $db->prepare("
+    SELECT e.nom, e.prenom, c.nom as classe_nom, i.date_inscription
+    FROM inscriptions i
+    JOIN etudiants e ON i.id_etudiant = e.id_etudiant
+    JOIN classes c ON i.id_classe = c.id_classe
+    ORDER BY i.date_inscription DESC, i.id_inscription DESC
+    LIMIT 5
+");
+$stmtDerniersInscrits->execute();
+$derniersInscrits = $stmtDerniersInscrits->fetchAll();
 
 require_once __DIR__ . '/../include/head.php';
 ?>
+<!-- Ajouter Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <body>
 <?php require_once __DIR__ . '/../include/sidebar.php'; ?>
 
@@ -26,10 +96,6 @@ require_once __DIR__ . '/../include/head.php';
                 <h1 class="page-title">Tableau de bord académique</h1>
                 <p class="page-subtitle mb-0">Bienvenue, <?= htmlspecialchars($userName) ?>. Voici l'état actuel de l'institution.</p>
             </div>
-            <button type="button" class="btn btn-primary-suptech d-flex align-items-center gap-2">
-                <span class="material-symbols-outlined" style="font-size: 20px;">add_circle</span>
-                Nouvelle action
-            </button>
         </div>
 
         <!-- Grille de statistiques -->
@@ -41,13 +107,11 @@ require_once __DIR__ . '/../include/head.php';
                         <div class="stat-icon primary-gradient d-flex align-items-center justify-content-center">
                             <span class="material-symbols-outlined" style="font-size: 28px;">groups</span>
                         </div>
-                        <span class="badge bg-success">+12%</span>
                     </div>
                     <p class="stat-label mb-2">ÉTUDIANTS</p>
-                    <h3 class="stat-value mb-2">342</h3>
+                    <h3 class="stat-value mb-2"><?= number_format($totalEtudiants, 0, ',', ' ') ?></h3>
                     <small class="text-muted d-flex align-items-center gap-1">
-                        <span class="material-symbols-outlined" style="font-size: 16px;">trending_up</span>
-                        Comparé au mois dernier
+                        Total base de données
                     </small>
                 </div>
             </div>
@@ -61,7 +125,7 @@ require_once __DIR__ . '/../include/head.php';
                         </div>
                     </div>
                     <p class="stat-label mb-2">ENSEIGNANTS</p>
-                    <h3 class="stat-value mb-2">28</h3>
+                    <h3 class="stat-value mb-2"><?= number_format($totalEnseignants, 0, ',', ' ') ?></h3>
                     <small class="text-muted">
                         Tous les rôles confondus
                     </small>
@@ -78,8 +142,8 @@ require_once __DIR__ . '/../include/head.php';
                         <span class="badge bg-info">Actif</span>
                     </div>
                     <p class="stat-label mb-2">INSCRIPTIONS</p>
-                    <h3 class="stat-value mb-2">310</h3>
-                    <small class="text-muted">Année 2025-2026</small>
+                    <h3 class="stat-value mb-2"><?= number_format($totalInscriptions, 0, ',', ' ') ?></h3>
+                    <small class="text-muted">Année en cours</small>
                 </div>
             </div>
 
@@ -92,9 +156,9 @@ require_once __DIR__ . '/../include/head.php';
                         </div>
                     </div>
                     <p class="stat-label mb-2">TAUX DE RÉUSSITE</p>
-                    <h3 class="stat-value mb-2">78%</h3>
+                    <h3 class="stat-value mb-2"><?= $tauxReussite ?>%</h3>
                     <div class="progress mt-3" style="height: 4px;">
-                        <div class="progress-bar bg-success" style="width: 78%"></div>
+                        <div class="progress-bar bg-success" style="width: <?= $tauxReussite ?>%"></div>
                     </div>
                 </div>
             </div>
@@ -104,52 +168,13 @@ require_once __DIR__ . '/../include/head.php';
         <div class="row g-4 mb-5">
             <!-- Paiements mensuels -->
             <div class="col-lg-8">
-                <div class="surface-card">
+                <div class="surface-card h-100">
                     <div class="card-header-surface d-flex justify-content-between align-items-center">
-                        <h3 class="mb-0 h6 fw-semibold">Paiements mensuels (FCFA)</h3>
-                        <select class="form-select form-select-sm" style="max-width: 150px;">
-                            <option>Année 2024</option>
-                            <option>Année 2023</option>
-                        </select>
+                        <h3 class="mb-0 h6 fw-semibold">Paiements mensuels (FCFA) - Année <?= date('Y') ?></h3>
                     </div>
                     <div class="p-4">
-                        <div class="d-flex align-items-end justify-content-between" style="height: 300px; gap: 1rem;">
-                            <!-- Barre JAN -->
-                            <div class="flex-grow-1 text-center">
-                                <div class="bg-primary-subtle rounded-top" style="height: 45%; min-height: 30px; position: relative; cursor: pointer;" 
-                                     title="1.2M" onmouseover="this.style.backgroundColor='var(--suptech-primary)'" onmouseout="this.style.backgroundColor='var(--bs-primary-subtle)'"></div>
-                                <small class="d-block mt-2 text-muted fw-semibold">JAN</small>
-                            </div>
-                            <!-- Barre FEV -->
-                            <div class="flex-grow-1 text-center">
-                                <div class="bg-primary-subtle rounded-top" style="height: 65%; min-height: 30px; position: relative; cursor: pointer;" 
-                                     title="2.1M" onmouseover="this.style.backgroundColor='var(--suptech-primary)'" onmouseout="this.style.backgroundColor='var(--bs-primary-subtle)'"></div>
-                                <small class="d-block mt-2 text-muted fw-semibold">FEV</small>
-                            </div>
-                            <!-- Barre MAR -->
-                            <div class="flex-grow-1 text-center">
-                                <div class="bg-primary rounded-top" style="height: 85%; min-height: 30px; position: relative; cursor: pointer;" 
-                                     title="3.5M"></div>
-                                <small class="d-block mt-2 text-muted fw-semibold">MAR</small>
-                            </div>
-                            <!-- Barre AVR -->
-                            <div class="flex-grow-1 text-center">
-                                <div class="bg-primary-subtle rounded-top" style="height: 70%; min-height: 30px; position: relative; cursor: pointer;" 
-                                     title="2.8M" onmouseover="this.style.backgroundColor='var(--suptech-primary)'" onmouseout="this.style.backgroundColor='var(--bs-primary-subtle)'"></div>
-                                <small class="d-block mt-2 text-muted fw-semibold">AVR</small>
-                            </div>
-                            <!-- Barre MAI -->
-                            <div class="flex-grow-1 text-center">
-                                <div class="bg-primary rounded-top" style="height: 95%; min-height: 30px; position: relative; cursor: pointer;" 
-                                     title="4.2M"></div>
-                                <small class="d-block mt-2 text-muted fw-semibold">MAI</small>
-                            </div>
-                            <!-- Barre JUIN -->
-                            <div class="flex-grow-1 text-center">
-                                <div class="bg-primary-subtle rounded-top" style="height: 75%; min-height: 30px; position: relative; cursor: pointer;" 
-                                     title="3.1M" onmouseover="this.style.backgroundColor='var(--suptech-primary)'" onmouseout="this.style.backgroundColor='var(--bs-primary-subtle)'"></div>
-                                <small class="d-block mt-2 text-muted fw-semibold">JUIN</small>
-                            </div>
+                        <div style="height: 300px; width: 100%;">
+                            <canvas id="paiementsChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -157,46 +182,21 @@ require_once __DIR__ . '/../include/head.php';
 
             <!-- Répartition par classe -->
             <div class="col-lg-4">
-                <div class="surface-card">
+                <div class="surface-card h-100">
                     <div class="card-header-surface">
-                        <h3 class="mb-0 h6 fw-semibold">Répartition par classe</h3>
+                        <h3 class="mb-0 h6 fw-semibold">Répartition des inscrits par classe</h3>
                     </div>
-                    <div class="p-4">
-                        <div class="position-relative mx-auto mb-4" style="width: 200px; height: 200px;">
-                            <svg viewBox="0 0 100 100" class="w-100 h-100" style="transform: rotate(-90deg)">
-                                <circle cx="50" cy="50" r="40" fill="none" stroke="#f0f0f0" stroke-width="8"></circle>
-                                <circle cx="50" cy="50" r="40" fill="none" stroke="var(--suptech-primary)" stroke-width="8" stroke-dasharray="32 100" stroke-linecap="round"></circle>
-                                <circle cx="50" cy="50" r="40" fill="none" stroke="var(--suptech-secondary)" stroke-width="8" stroke-dasharray="22 100" stroke-dashoffset="-32" stroke-linecap="round"></circle>
-                                <circle cx="50" cy="50" r="40" fill="none" stroke="var(--suptech-tertiary)" stroke-width="8" stroke-dasharray="12 100" stroke-dashoffset="-54" stroke-linecap="round"></circle>
-                            </svg>
-                            <div class="position-absolute top-50 start-50 translate-middle text-center">
-                                <h4 class="mb-0 fw-bold">342</h4>
-                                <small class="text-muted">TOTAL</small>
+                    <div class="p-4 d-flex flex-column justify-content-center align-items-center" style="height: calc(100% - 53px);">
+                        <?php if (empty($classesData)): ?>
+                            <div class="text-muted text-center">
+                                <span class="material-symbols-outlined mb-2" style="font-size: 48px; opacity: 0.5;">pie_chart</span>
+                                <p>Aucune donnée d'inscription pour l'année en cours.</p>
                             </div>
-                        </div>
-                        <div class="space-y-3">
-                            <div class="d-flex justify-content-between align-items-center small">
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="badge rounded-circle" style="background-color: var(--suptech-primary); width: 12px; height: 12px;"></span>
-                                    <span>L3 Dev Web</span>
-                                </div>
-                                <span class="fw-semibold">40%</span>
+                        <?php else: ?>
+                            <div style="width: 100%; max-width: 250px;">
+                                <canvas id="classesChart"></canvas>
                             </div>
-                            <div class="d-flex justify-content-between align-items-center small">
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="badge rounded-circle" style="background-color: var(--suptech-secondary); width: 12px; height: 12px;"></span>
-                                    <span>M1 Gestion Logiciel</span>
-                                </div>
-                                <span class="fw-semibold">28%</span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center small">
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="badge rounded-circle" style="background-color: var(--suptech-tertiary); width: 12px; height: 12px;"></span>
-                                    <span>M2 Cybersecurity</span>
-                                </div>
-                                <span class="fw-semibold">18%</span>
-                            </div>
-                        </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -205,116 +205,45 @@ require_once __DIR__ . '/../include/head.php';
         <!-- Tables des données récentes -->
         <div class="row g-4">
             <!-- Derniers étudiants inscrits -->
-            <div class="col-lg-6">
+            <div class="col-lg-12">
                 <div class="surface-card">
                     <div class="card-header-surface d-flex justify-content-between align-items-center">
                         <h3 class="mb-0 h6 fw-semibold">Derniers étudiants inscrits</h3>
                         <a href="<?= url('gestion_des_inscriptions/gestiondesinscription.php') ?>" class="text-primary text-decoration-none small fw-semibold">
-                            Voir tout
+                            Voir toutes les inscriptions
                             <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: -2px;">arrow_forward</span>
                         </a>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-hover table-sm mb-0">
-                            <thead class="table-light">
+                        <table class="table table-suptech mb-0">
+                            <thead>
                                 <tr>
                                     <th>Étudiant</th>
-                                    <th>Filière</th>
-                                    <th>Date</th>
-                                    <th>Actions</th>
+                                    <th>Classe</th>
+                                    <th>Date d'inscription</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="student-avatar sm">MD</div>
-                                            <span>Mamadou Diallo</span>
-                                        </div>
-                                    </td>
-                                    <td>L3 Dev Web</td>
-                                    <td>12 Oct 2023</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-icon" title="Voir">
-                                            <span class="material-symbols-outlined" style="font-size: 18px;">visibility</span>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="student-avatar sm">FN</div>
-                                            <span>Fatou Ndiaye</span>
-                                        </div>
-                                    </td>
-                                    <td>M1 Gestion Logiciel</td>
-                                    <td>11 Oct 2023</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-icon" title="Voir">
-                                            <span class="material-symbols-outlined" style="font-size: 18px;">visibility</span>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="student-avatar sm">OS</div>
-                                            <span>Ousmane Sarr</span>
-                                        </div>
-                                    </td>
-                                    <td>M2 Data Science</td>
-                                    <td>10 Oct 2023</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-icon" title="Voir">
-                                            <span class="material-symbols-outlined" style="font-size: 18px;">visibility</span>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Dernières notes enregistrées -->
-            <div class="col-lg-6">
-                <div class="surface-card">
-                    <div class="card-header-surface d-flex justify-content-between align-items-center">
-                        <h3 class="mb-0 h6 fw-semibold">Dernières notes enregistrées</h3>
-                        <a href="<?= url('gestion_des_notes_enseignant/gestiondesnote.php') ?>" class="text-primary text-decoration-none small fw-semibold">
-                            Saisir une note
-                            <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: -2px;">arrow_forward</span>
-                        </a>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover table-sm mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Module</th>
-                                    <th>Étudiant</th>
-                                    <th>Note</th>
-                                    <th>Statut</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Algorithmique</td>
-                                    <td>Mamadou Diallo</td>
-                                    <td class="fw-semibold text-primary">16.5</td>
-                                    <td><span class="badge bg-success-subtle text-success">Validé</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Base de Données</td>
-                                    <td>Fatou Ndiaye</td>
-                                    <td class="fw-semibold text-primary">14.0</td>
-                                    <td><span class="badge bg-success-subtle text-success">Validé</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Marketing Digital</td>
-                                    <td>Ousmane Sarr</td>
-                                    <td class="fw-semibold text-danger">08.0</td>
-                                    <td><span class="badge bg-danger-subtle text-danger">Rattrapage</span></td>
-                                </tr>
+                                <?php if (empty($derniersInscrits)): ?>
+                                    <tr>
+                                        <td colspan="3" class="text-center py-4 text-muted">Aucune inscription récente.</td>
+                                    </tr>
+                                <?php else: ?>
+                                    <?php foreach ($derniersInscrits as $di): 
+                                        $initials = strtoupper(substr($di['prenom'], 0, 1) . substr($di['nom'], 0, 1));
+                                    ?>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="student-avatar sm" style="width: 32px; height: 32px; border-radius: 50%; background: var(--suptech-primary-light); color: var(--suptech-primary); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;"><?= $initials ?></div>
+                                                <span class="fw-medium"><?= htmlspecialchars($di['prenom'] . ' ' . $di['nom']) ?></span>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge bg-light text-dark border"><?= htmlspecialchars($di['classe_nom']) ?></span></td>
+                                        <td class="text-muted"><?= date('d/m/Y', strtotime($di['date_inscription'])) ?></td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
@@ -325,3 +254,98 @@ require_once __DIR__ . '/../include/head.php';
 </div>
 
 <?php require_once __DIR__ . '/../include/footer.php'; ?>
+
+<!-- Script Chart.js -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Configuration globale Chart.js pour s'adapter au Dark Mode
+    const isDarkMode = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+    const textColor = isDarkMode ? '#cbd5e1' : '#444651';
+    const gridColor = isDarkMode ? '#334155' : '#e2e8f0';
+
+    Chart.defaults.color = textColor;
+    Chart.defaults.font.family = "'Inter', sans-serif";
+
+    // 1. Graphique des paiements (Bar)
+    const paiementsCtx = document.getElementById('paiementsChart');
+    if (paiementsCtx) {
+        new Chart(paiementsCtx, {
+            type: 'bar',
+            data: {
+                labels: <?= json_encode($moisLibelles) ?>,
+                datasets: [{
+                    label: 'Montant encaissé (FCFA)',
+                    data: <?= json_encode($paiementsData) ?>,
+                    backgroundColor: '#00236f',
+                    borderRadius: 4,
+                    barThickness: 20
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: gridColor },
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('fr-FR') + ' F';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw.toLocaleString('fr-FR') + ' FCFA';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 2. Graphique Répartition par classe (Doughnut)
+    const classesCtx = document.getElementById('classesChart');
+    if (classesCtx) {
+        new Chart(classesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: <?= json_encode($classesLabels) ?>,
+                datasets: [{
+                    data: <?= json_encode($classesData) ?>,
+                    backgroundColor: <?= json_encode($classesColors) ?>,
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+});
+</script>
+</body>
+</html>

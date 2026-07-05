@@ -6,8 +6,13 @@ $pageTitle = $pageTitle ?? APP_NAME;
 $layout = $layout ?? 'admin';
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-bs-theme="light">
 <head>
+    <script>
+        // Appliquer le thème avant le rendu pour éviter un flash
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-bs-theme', savedTheme);
+    </script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle) ?> - SupTech Business School</title>
