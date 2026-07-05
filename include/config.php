@@ -59,6 +59,7 @@ function getMenuItems(): array
     // =========================================================
     elseif ($role === 'enseignant') {
         $items = [
+            ['id' => 'modules',         'label' => 'Modules',          'icon' => 'book',            'url' => url('gestion_des_modules/gestiondesmodule.php')],
             ['id' => 'notes',           'label' => 'Saisie des Notes', 'icon' => 'description',     'url' => url('gestion_des_notes_enseignant/gestiondesnote.php')],
             ['id' => 'emploi_du_temps', 'label' => 'Mon Emploi du temps','icon' => 'calendar_today',  'url' => url('emploi_du_temps/emploi_du_temps.php')],
         ];
