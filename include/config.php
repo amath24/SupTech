@@ -51,7 +51,7 @@ function getMenuItems(): array
             ['id' => 'paiements',       'label' => 'Paiements',        'icon' => 'payments',        'url' => url('gestion_des_paiements/gestiondespaiements.php')],
             ['id' => 'notes',           'label' => 'Notes',            'icon' => 'description',     'url' => url('gestion_des_notes_enseignant/gestiondesnote.php')],
             ['id' => 'emploi_du_temps', 'label' => 'Emploi du temps',  'icon' => 'calendar_today',  'url' => url('emploi_du_temps/emploi_du_temps.php')],
-            ['id' => 'statistiques',    'label' => 'Statistiques',     'icon' => 'query_stats',     'url' => '#'],
+            ['id' => 'statistiques',    'label' => 'Statistiques',     'icon' => 'query_stats',     'url' => url('statistique/statistique.php')],
         ];
     }
     // =========================================================
