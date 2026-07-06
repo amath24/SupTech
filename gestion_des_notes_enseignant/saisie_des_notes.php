@@ -111,16 +111,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
             $incomplete++;
             continue;
         }
-        if (!is_numeric($cc) || !is_numeric($tp) || !is_numeric($ex)
-            || $cc < 0 || $cc > 20 || $tp < 0 || $tp > 20 || $ex < 0 || $ex > 20) {
+        if (
+            !is_numeric($cc) || !is_numeric($tp) || !is_numeric($ex)
+            || $cc < 0 || $cc > 20 || $tp < 0 || $tp > 20 || $ex < 0 || $ex > 20
+        ) {
             $invalid++;
             continue;
         }
 
         $stmt->execute([
-            ':cc' => $cc, ':tp' => $tp, ':examen' => $ex,
-            ':id_etudiant' => $posted_id_etudiant, ':id_assignation' => $id_assignation,
-            ':cc_u' => $cc, ':tp_u' => $tp, ':examen_u' => $ex,
+            ':cc' => $cc,
+            ':tp' => $tp,
+            ':examen' => $ex,
+            ':id_etudiant' => $posted_id_etudiant,
+            ':id_assignation' => $id_assignation,
+            ':cc_u' => $cc,
+            ':tp_u' => $tp,
+            ':examen_u' => $ex,
         ]);
         $saved++;
     }
@@ -257,37 +264,39 @@ require_once __DIR__ . '/../include/head.php';
 
                                     <tbody>
                                         <?php if (empty($modules)): ?>
-                                            <tr><td colspan="6" class="text-center text-muted py-4">Aucun module assigné à la classe de cet étudiant pour <?= htmlspecialchars($annee['libelle']) ?>.</td></tr>
+                                            <tr>
+                                                <td colspan="6" class="text-center text-muted py-4">Aucun module assigné à la classe de cet étudiant pour <?= htmlspecialchars($annee['libelle']) ?>.</td>
+                                            </tr>
                                         <?php endif; ?>
                                         <?php foreach ($modules as $m): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($m['module_nom']) ?></td>
-                                            <td class="coef"><?= htmlspecialchars($m['coefficient']) ?></td>
-                                            <td>
-                                                <input type="number"
-                                                    class="form-control note js-cc"
-                                                    min="0" max="20" step="0.5"
-                                                    name="notes[<?= (int) $m['id_assignation'] ?>][cc]"
-                                                    value="<?= $m['cc'] !== null ? htmlspecialchars($m['cc']) : '' ?>">
-                                            </td>
-                                            <td>
-                                                <input type="number"
-                                                    class="form-control note js-tp"
-                                                    min="0" max="20" step="0.5"
-                                                    name="notes[<?= (int) $m['id_assignation'] ?>][tp]"
-                                                    value="<?= $m['tp'] !== null ? htmlspecialchars($m['tp']) : '' ?>">
-                                            </td>
-                                            <td>
-                                                <input type="number"
-                                                    class="form-control note js-examen"
-                                                    min="0" max="20" step="0.5"
-                                                    name="notes[<?= (int) $m['id_assignation'] ?>][examen]"
-                                                    value="<?= $m['examen'] !== null ? htmlspecialchars($m['examen']) : '' ?>">
-                                            </td>
-                                            <td class="text-center fw-bold js-moyenne-module" data-coef="<?= htmlspecialchars($m['coefficient']) ?>">
-                                                <?= $m['moyenne'] !== null ? number_format((float) $m['moyenne'], 2) : '--' ?>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <td><?= htmlspecialchars($m['module_nom']) ?></td>
+                                                <td class="coef"><?= htmlspecialchars($m['coefficient']) ?></td>
+                                                <td>
+                                                    <input type="number"
+                                                        class="form-control note js-cc"
+                                                        min="0" max="20" step="0.5"
+                                                        name="notes[<?= (int) $m['id_assignation'] ?>][cc]"
+                                                        value="<?= $m['cc'] !== null ? htmlspecialchars($m['cc']) : '' ?>">
+                                                </td>
+                                                <td>
+                                                    <input type="number"
+                                                        class="form-control note js-tp"
+                                                        min="0" max="20" step="0.5"
+                                                        name="notes[<?= (int) $m['id_assignation'] ?>][tp]"
+                                                        value="<?= $m['tp'] !== null ? htmlspecialchars($m['tp']) : '' ?>">
+                                                </td>
+                                                <td>
+                                                    <input type="number"
+                                                        class="form-control note js-examen"
+                                                        min="0" max="20" step="0.5"
+                                                        name="notes[<?= (int) $m['id_assignation'] ?>][examen]"
+                                                        value="<?= $m['examen'] !== null ? htmlspecialchars($m['examen']) : '' ?>">
+                                                </td>
+                                                <td class="text-center fw-bold js-moyenne-module" data-coef="<?= htmlspecialchars($m['coefficient']) ?>">
+                                                    <?= $m['moyenne'] !== null ? number_format((float) $m['moyenne'], 2) : '--' ?>
+                                                </td>
+                                            </tr>
                                         <?php endforeach; ?>
                                     </tbody>
 
@@ -331,13 +340,16 @@ require_once __DIR__ . '/../include/head.php';
 
     <script>
         function recalcGenerale() {
-            var total = 0, coefTotal = 0;
-            document.querySelectorAll('#notesForm tbody tr').forEach(function (tr) {
+            var total = 0,
+                coefTotal = 0;
+            document.querySelectorAll('#notesForm tbody tr').forEach(function(tr) {
                 var ccInput = tr.querySelector('.js-cc');
                 var tpInput = tr.querySelector('.js-tp');
                 var exInput = tr.querySelector('.js-examen');
                 var coefCell = tr.querySelector('.js-moyenne-module');
-                if (!coefCell || !ccInput) { return; }
+                if (!coefCell || !ccInput) {
+                    return;
+                }
                 var cc = parseFloat(ccInput.value);
                 var tp = parseFloat(tpInput.value);
                 var ex = parseFloat(exInput.value);
@@ -353,7 +365,7 @@ require_once __DIR__ . '/../include/head.php';
             });
             document.getElementById('moyenne').value = coefTotal > 0 ? (total / coefTotal).toFixed(2) : '--';
         }
-        document.querySelectorAll('#notesForm .note').forEach(function (input) {
+        document.querySelectorAll('#notesForm .note').forEach(function(input) {
             input.addEventListener('input', recalcGenerale);
         });
     </script>
