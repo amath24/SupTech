@@ -2,9 +2,13 @@
 if (!defined('BASE_PATH')) {
     require_once __DIR__ . '/config.php';
 }
-$userName = $userName ?? 'Admin Principal';
-$userRole = $userRole ?? 'Profil Utilisateur';
-$userInitials = $userInitials ?? 'AP';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+$userName = isset($_SESSION['user_prenom']) ? $_SESSION['user_prenom'] . ' ' . $_SESSION['user_nom'] : 'Utilisateur';
+$userRole = $_SESSION['user_role'] ?? 'Profil';
+$userInitials = isset($_SESSION['user_prenom']) ? strtoupper(mb_substr($_SESSION['user_prenom'], 0, 1) . mb_substr($_SESSION['user_nom'], 0, 1)) : 'U';
+$userPhoto = $_SESSION['user_photo'] ?? null;
 ?>
 <!-- Top Header -->
 <header class="top-header">
@@ -30,9 +34,15 @@ $userInitials = $userInitials ?? 'AP';
         <div class="header-profile">
             <div class="profile-info d-none d-md-flex">
                 <span class="profile-name"><?= htmlspecialchars($userName) ?></span>
-                <span class="profile-role"><?= htmlspecialchars($userRole) ?></span>
+                <span class="profile-role text-capitalize"><?= htmlspecialchars($userRole) ?></span>
             </div>
-            <div class="profile-avatar"><?= htmlspecialchars($userInitials) ?></div>
+            <div class="profile-avatar overflow-hidden">
+                <?php if ($userPhoto): ?>
+                    <img src="<?= url('upload/' . htmlspecialchars($userPhoto)) ?>" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                <?php else: ?>
+                    <?= htmlspecialchars($userInitials) ?>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 </header>
