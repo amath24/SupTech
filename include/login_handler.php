@@ -27,13 +27,21 @@ if (empty($email) || empty($password)) {
 try {
     $pdo = Database::getInstance();
 
-    // 3. Requête SQL alignée avec votre structure (id_utilisateur, statut, id_role)
+    // Auto-migration : s'assurer que la colonne photo existe
+    try {
+        $pdo->query("SELECT photo FROM utilisateurs LIMIT 1");
+    } catch (PDOException $e) {
+        $pdo->exec("ALTER TABLE utilisateurs ADD COLUMN photo VARCHAR(255) DEFAULT NULL");
+    }
+
+    // 3. Requête SQL alignée avec votre structure
     $query = $pdo->prepare('
         SELECT 
             u.id_utilisateur, 
             u.nom, 
             u.prenom, 
-            u.mot_de_passe, 
+            u.mot_de_passe,
+            u.photo,
             r.libelle as role
         FROM utilisateurs u
         INNER JOIN roles r ON u.id_role = r.id_role
@@ -56,6 +64,7 @@ try {
     $_SESSION['user_nom'] = $user['nom'];
     $_SESSION['user_prenom'] = $user['prenom'];
     $_SESSION['user_role'] = $user['role'];
+    $_SESSION['user_photo'] = $user['photo'] ?? null;
     unset($_SESSION['error']);
 
     // 6. Redirection selon le rôle
