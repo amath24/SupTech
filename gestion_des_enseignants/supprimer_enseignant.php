@@ -1,4 +1,4 @@
-<?php
+ <?php
 $page_required_role = ['Administrateur', 'Scolarité'];
 require_once __DIR__ . '/../include/auth_check.php';
 require_once __DIR__ . '/../include/config.php';

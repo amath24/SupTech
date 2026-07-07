@@ -56,7 +56,16 @@ function initiales(string $nom, string $prenom): string
 // 1. Liste des assignations (module + classe + enseignant + année)
 //    -> alimente le sélecteur permettant de choisir le cours à gérer
 // --------------------------------------------------------------------
-$assignations = $pdo->query("
+$user_role = strtolower($_SESSION['user_role'] ?? '');
+$user_id = $_SESSION['user_id'] ?? 0;
+$id_enseignant = 0;
+if ($user_role === 'enseignant') {
+    $stmt = $pdo->prepare("SELECT id_enseignant FROM enseignants WHERE id_utilisateur = ?");
+    $stmt->execute([$user_id]);
+    $id_enseignant = $stmt->fetchColumn() ?: 0;
+}
+
+$sql_assign = "
     SELECT a.id_assignation, m.nom AS module_nom, m.coefficient,
            c.id_classe, c.nom AS classe_nom, c.niveau,
            en.nom AS ens_nom, en.prenom AS ens_prenom,
@@ -66,8 +75,17 @@ $assignations = $pdo->query("
     JOIN classes c            ON c.id_classe = a.id_classe
     JOIN enseignants en       ON en.id_enseignant = a.id_enseignant
     JOIN annees_universitaires an ON an.id_annee = a.id_annee
-    ORDER BY c.nom, m.nom
-")->fetchAll();
+";
+$params_assign = [];
+if ($user_role === 'enseignant') {
+    $sql_assign .= " WHERE a.id_enseignant = ?";
+    $params_assign[] = $id_enseignant;
+}
+$sql_assign .= " ORDER BY c.nom, m.nom";
+
+$stmt_assign = $pdo->prepare($sql_assign);
+$stmt_assign->execute($params_assign);
+$assignations = $stmt_assign->fetchAll();
 
 if (empty($assignations)) {
     die("Aucune assignation de module n'a été trouvée (table assignation_modules vide). Créez d'abord une assignation module/classe/enseignant/année.");

@@ -20,6 +20,15 @@ $filiere_filter = $_GET['filiere'] ?? '';
 // Fetch filters
 $filieres = $db->query("SELECT DISTINCT filiere FROM classes WHERE filiere IS NOT NULL AND filiere != '' ORDER BY filiere")->fetchAll(PDO::FETCH_COLUMN);
 
+$user_role = strtolower($_SESSION['user_role'] ?? '');
+$user_id = $_SESSION['user_id'] ?? 0;
+$id_enseignant = 0;
+if ($user_role === 'enseignant') {
+    $stmt = $db->prepare("SELECT id_enseignant FROM enseignants WHERE id_utilisateur = ?");
+    $stmt->execute([$user_id]);
+    $id_enseignant = $stmt->fetchColumn() ?: 0;
+}
+
 $queryStr = "
     SELECT 
         m.id_module, m.nom, m.coefficient, m.nombre_heures,
@@ -38,6 +47,11 @@ $params = [];
 if (!empty($filiere_filter)) {
     $whereClauses[] = "c.filiere = ?";
     $params[] = $filiere_filter;
+}
+
+if ($user_role === 'enseignant') {
+    $whereClauses[] = "am.id_enseignant = ?";
+    $params[] = $id_enseignant;
 }
 
 if (!empty($whereClauses)) {

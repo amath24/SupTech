@@ -38,12 +38,31 @@ if (!$annee) {
 // --------------------------------------------------------------------
 // 2. Liste des étudiants -> alimente le sélecteur "Étudiant"
 // --------------------------------------------------------------------
-$etudiantsListe = $pdo->query("
+$user_role = strtolower($_SESSION['user_role'] ?? '');
+$user_id = $_SESSION['user_id'] ?? 0;
+$id_enseignant = 0;
+if ($user_role === 'enseignant') {
+    $stmt = $pdo->prepare("SELECT id_enseignant FROM enseignants WHERE id_utilisateur = ?");
+    $stmt->execute([$user_id]);
+    $id_enseignant = $stmt->fetchColumn() ?: 0;
+}
+
+$sqlEtu = "
     SELECT e.id_etudiant, e.matricule, e.nom, e.prenom, c.nom AS classe_nom
     FROM etudiants e
     JOIN classes c ON c.id_classe = e.id_classe
-    ORDER BY e.nom, e.prenom
-")->fetchAll();
+";
+$paramsEtu = [];
+
+if ($user_role === 'enseignant') {
+    $sqlEtu .= " WHERE e.id_classe IN (SELECT id_classe FROM assignation_modules WHERE id_enseignant = ?)";
+    $paramsEtu[] = $id_enseignant;
+}
+$sqlEtu .= " ORDER BY e.nom, e.prenom";
+
+$stmtEtu = $pdo->prepare($sqlEtu);
+$stmtEtu->execute($paramsEtu);
+$etudiantsListe = $stmtEtu->fetchAll();
 
 if (empty($etudiantsListe)) {
     die("Aucun étudiant n'est enregistré dans la table etudiants.");
@@ -159,16 +178,24 @@ if (isset($_GET['saved'])) {
 // 5. Modules assignés à la classe de l'étudiant pour l'année en cours,
 //    avec la note déjà saisie le cas échéant
 // --------------------------------------------------------------------
-$stmtMod = $pdo->prepare("
+$sqlMod = "
     SELECT a.id_assignation, m.id_module, m.nom AS module_nom, m.coefficient,
            n.cc, n.tp, n.examen, n.moyenne, n.mention
     FROM assignation_modules a
     JOIN modules m ON m.id_module = a.id_module
     LEFT JOIN notes n ON n.id_assignation = a.id_assignation AND n.id_etudiant = :id_etudiant
     WHERE a.id_classe = :id_classe AND a.id_annee = :id_annee
-    ORDER BY m.nom
-");
-$stmtMod->execute([':id_etudiant' => $id_etudiant, ':id_classe' => $id_classe, ':id_annee' => $annee['id_annee']]);
+";
+$paramsMod = [':id_etudiant' => $id_etudiant, ':id_classe' => $id_classe, ':id_annee' => $annee['id_annee']];
+
+if ($user_role === 'enseignant') {
+    $sqlMod .= " AND a.id_enseignant = :id_enseignant";
+    $paramsMod[':id_enseignant'] = $id_enseignant;
+}
+$sqlMod .= " ORDER BY m.nom";
+
+$stmtMod = $pdo->prepare($sqlMod);
+$stmtMod->execute($paramsMod);
 $modules = $stmtMod->fetchAll();
 
 // --------------------------------------------------------------------

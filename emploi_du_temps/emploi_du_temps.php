@@ -1,16 +1,95 @@
 <?php
 require_once __DIR__ . '/../include/config.php';
+require_once __DIR__ . '/../include/config/database.php';
 
 $pageTitle = 'Emploi du temps';
 $activePage = 'emploi_du_temps';
 
 require_once __DIR__ . '/../include/head.php';
 
-$seances = [
-    ['jour' => 'Lun', 'heure' => '08h00 - 11h00', 'intitule' => 'PHP Avancé', 'enseignant' => 'Dr. Fall', 'salle' => 'Salle C.A. Diop', 'niveau' => 'Licence 3'],
-    ['jour' => 'Mar', 'heure' => '14h00 - 17h00', 'intitule' => 'Bases de données', 'enseignant' => 'Pr. Ndiaye', 'salle' => 'Amphi B', 'niveau' => 'Master 1'],
-    ['jour' => 'Mer', 'heure' => '10h00 - 12h00', 'intitule' => 'Gestion Projets', 'enseignant' => 'Dr. Sow', 'salle' => 'Salle 102', 'niveau' => 'Master 1', 'conflict' => true],
-];
+// Connexion à la base de données
+$pdo = Database::getInstance();
+
+// Récupérer la classe sélectionnée
+$selected_classe_id = isset($_GET['classe_id']) ? (int)$_GET['classe_id'] : 0;
+
+$user_role = strtolower($_SESSION['user_role'] ?? '');
+$user_id = $_SESSION['user_id'] ?? 0;
+$id_enseignant = 0;
+if ($user_role === 'enseignant') {
+    $stmt = $pdo->prepare("SELECT id_enseignant FROM enseignants WHERE id_utilisateur = ?");
+    $stmt->execute([$user_id]);
+    $id_enseignant = $stmt->fetchColumn() ?: 0;
+}
+
+// Récupérer la liste des classes
+$sqlClasses = "SELECT id_classe, nom, niveau FROM classes";
+$paramsClasses = [];
+
+if ($user_role === 'enseignant') {
+    $sqlClasses .= " WHERE id_classe IN (SELECT id_classe FROM assignation_modules WHERE id_enseignant = ?)";
+    $paramsClasses[] = $id_enseignant;
+}
+$sqlClasses .= " ORDER BY niveau, nom";
+
+$stmtClasses = $pdo->prepare($sqlClasses);
+$stmtClasses->execute($paramsClasses);
+$classes = $stmtClasses->fetchAll();
+
+if ($selected_classe_id === 0 && count($classes) > 0) {
+    $selected_classe_id = $classes[0]['id_classe'];
+}
+
+// Fetch the timetable for the selected class
+$seances_raw = [];
+if ($selected_classe_id > 0) {
+    $sql = "
+        SELECT 
+            et.id_seance, et.jour, et.heure_debut, et.heure_fin,
+            m.nom AS module_nom,
+            e.nom AS prof_nom, e.prenom AS prof_prenom,
+            s.nom AS salle_nom
+        FROM emploi_temps et
+        JOIN assignation_modules am ON et.id_assignation = am.id_assignation
+        JOIN modules m ON am.id_module = m.id_module
+        JOIN enseignants e ON am.id_enseignant = e.id_enseignant
+        JOIN salles s ON et.id_salle = s.id_salle
+        WHERE am.id_classe = :classe_id
+        ORDER BY et.heure_debut ASC
+    ";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['classe_id' => $selected_classe_id]);
+    $seances_raw = $stmt->fetchAll();
+}
+
+$jours_semaine = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+
+// Extract unique timeslots
+$timeslots = [];
+foreach ($seances_raw as $s) {
+    $slot = date('H:i', strtotime($s['heure_debut'])) . ' - ' . date('H:i', strtotime($s['heure_fin']));
+    if (!in_array($slot, $timeslots)) {
+        $timeslots[] = $slot;
+    }
+}
+usort($timeslots, function($a, $b) {
+    return strcmp(substr($a, 0, 5), substr($b, 0, 5));
+});
+
+// Build matrix
+$matrix = [];
+foreach ($timeslots as $slot) {
+    foreach ($jours_semaine as $jour) {
+        $matrix[$slot][$jour] = [];
+    }
+}
+
+foreach ($seances_raw as $s) {
+    $slot = date('H:i', strtotime($s['heure_debut'])) . ' - ' . date('H:i', strtotime($s['heure_fin']));
+    $jour = $s['jour'];
+    $matrix[$slot][$jour][] = $s;
+}
+
 ?>
 <body class="admin-layout">
     <?php require_once __DIR__ . '/../include/sidebar.php'; ?>
@@ -25,97 +104,85 @@ $seances = [
                     <p class="page-subtitle mb-0">Gestion hebdomadaire des cours et ressources</p>
                 </div>
                 <div class="d-flex gap-2 align-items-center">
-                    <select class="form-select form-select-sm me-2" style="min-width:200px;">
-                        <option>Master 1 - Informatique</option>
-                        <option>Licence 3 - Gestion</option>
-                        <option>Master 2 - Finance</option>
-                    </select>
-                    <select class="form-select form-select-sm me-2" style="min-width:220px;">
-                        <option>Semaine 42 (16 Oct - 21 Oct)</option>
-                        <option>Semaine 43 (23 Oct - 28 Oct)</option>
-                    </select>
-                    <button type="button" class="btn btn-primary-suptech d-flex align-items-center gap-2">
+                    <form method="GET" action="emploi_du_temps.php" class="d-flex gap-2 m-0">
+                        <select name="classe_id" class="form-select form-select-sm" style="min-width:250px;" onchange="this.form.submit()">
+                            <?php foreach ($classes as $c): ?>
+                                <option value="<?= $c['id_classe'] ?>" <?= $c['id_classe'] == $selected_classe_id ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($c['niveau'] . ' - ' . $c['nom']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </form>
+                    
+                    <?php if (strtolower(trim($_SESSION['user_role'] ?? '')) === 'administrateur'): ?>
+                    <a href="ajouter_seance.php" class="btn btn-primary-suptech d-flex align-items-center gap-2">
                         <span class="material-symbols-outlined" style="font-size:18px;">add</span>
-                        Ajouter une séance
-                    </button>
+                        Ajouter
+                    </a>
+                    <?php endif; ?>
                 </div>
             </div>
-
-            <?php if (array_filter($seances, fn($s)=> isset($s['conflict']))) : ?>
-            <div class="alert alert-danger d-flex justify-content-between align-items-start" role="alert">
-                <div>
-                    <h5 class="mb-1">Conflit d'horaire détecté</h5>
-                    <div>Le Professeur <strong>Dr. Sow</strong> est assigné à deux cours simultanés le Mercredi à 10h00.</div>
-                </div>
-                <div class="ms-3">
-                    <button class="btn btn-danger btn-sm">Résoudre</button>
-                </div>
-            </div>
-            <?php endif; ?>
 
             <div class="surface-card">
                 <div class="table-responsive p-3">
+                    <?php if (empty($timeslots)): ?>
+                        <div class="alert alert-info mb-0 d-flex align-items-center gap-2">
+                            <span class="material-symbols-outlined">info</span>
+                            Aucun cours n'est programmé pour cette classe.
+                        </div>
+                    <?php else: ?>
                     <table class="table table-bordered mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th style="width:120px">Heure</th>
-                                <th>Lundi 16</th>
-                                <th>Mardi 17</th>
-                                <th>Mercredi 18</th>
-                                <th>Jeudi 19</th>
-                                <th>Vendredi 20</th>
-                                <th>Samedi 21</th>
+                                <th style="width:120px" class="text-center">Heure</th>
+                                <?php foreach ($jours_semaine as $jour): ?>
+                                <th class="text-center" style="min-width: 150px;"><?= $jour ?></th>
+                                <?php endforeach; ?>
                             </tr>
                         </thead>
                         <tbody>
+                            <?php foreach ($timeslots as $slot): ?>
                             <tr>
-                                <td class="fw-semibold">08h00 - 11h00</td>
-                                <td>
-                                    <div class="card p-2 mb-2">
-                                        <div class="fw-semibold">PHP Avancé</div>
-                                        <div class="small text-muted">Dr. Fall — Salle C.A. Diop</div>
-                                    </div>
+                                <td class="fw-bold align-middle text-center bg-light text-primary"><?= str_replace(' - ', '<br>-<br>', $slot) ?></td>
+                                <?php foreach ($jours_semaine as $jour): ?>
+                                <td class="align-top">
+                                    <?php if (!empty($matrix[$slot][$jour])): ?>
+                                        <?php foreach ($matrix[$slot][$jour] as $seance): ?>
+                                            <div class="card p-2 mb-2 shadow-sm border-0 border-start border-primary border-4 bg-white" style="border-radius: 4px;">
+                                                <div class="fw-bold text-primary mb-1" style="font-size: 0.95rem;"><?= htmlspecialchars($seance['module_nom']) ?></div>
+                                                <div class="small text-muted d-flex align-items-center gap-1 mb-1">
+                                                    <span class="material-symbols-outlined" style="font-size:14px;">person</span>
+                                                    <?= htmlspecialchars($seance['prof_prenom'] . ' ' . $seance['prof_nom']) ?>
+                                                </div>
+                                                <div class="small text-muted d-flex align-items-center gap-1">
+                                                    <span class="material-symbols-outlined" style="font-size:14px;">room</span>
+                                                    <?= htmlspecialchars($seance['salle_nom']) ?>
+                                                </div>
+                                                <?php if (strtolower(trim($_SESSION['user_role'] ?? '')) === 'administrateur'): ?>
+                                                <div class="mt-2 text-end">
+                                                    <a href="supprimer_seance.php?id=<?= $seance['id_seance'] ?>" class="text-danger text-decoration-none small d-inline-flex align-items-center p-1 rounded hover-bg-light" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette séance ?');">
+                                                        <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
+                                                    </a>
+                                                </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
                                 </td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <?php endforeach; ?>
                             </tr>
-                            <tr>
-                                <td class="fw-semibold">09h00 - 12h00</td>
-                                <td></td>
-                                <td></td>
-                                <td>
-                                    <div class="card p-2 mb-2 border-danger">
-                                        <div class="fw-semibold">Gestion Projets <span class="badge bg-danger ms-2">Conflit</span></div>
-                                        <div class="small text-muted">Dr. Sow — Salle 102</div>
-                                    </div>
-                                </td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td class="fw-semibold">14h00 - 17h00</td>
-                                <td></td>
-                                <td>
-                                    <div class="card p-2 mb-2">
-                                        <div class="fw-semibold">Bases de données</div>
-                                        <div class="small text-muted">Pr. Ndiaye — Amphi B</div>
-                                    </div>
-                                </td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
+                    <?php endif; ?>
                 </div>
             </div>
 
         </main>
     </div>
+
+    <style>
+        .hover-bg-light:hover { background-color: #f8f9fa; }
+    </style>
 
     <?php require_once __DIR__ . '/../include/footer.php'; ?>
