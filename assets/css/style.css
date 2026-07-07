@@ -988,3 +988,46 @@ input[type="number"] {
 [data-bs-theme="dark"] .sidebar {
     background-color: #00164a !important; /* Bleu assombri pour un meilleur contraste */
 }
+
+/* Corrections supplémentaires pour la visibilité des textes en mode sombre */
+[data-bs-theme="dark"] .text-dark {
+    color: var(--suptech-on-surface) !important;
+}
+
+[data-bs-theme="dark"] .text-muted {
+    color: var(--suptech-on-surface-variant) !important;
+}
+
+[data-bs-theme="dark"] .table-light,
+[data-bs-theme="dark"] .table-light th,
+[data-bs-theme="dark"] .table-light td {
+    background-color: var(--suptech-surface-variant) !important;
+    color: var(--suptech-on-surface) !important;
+    border-color: var(--suptech-outline-variant) !important;
+}
+
+[data-bs-theme="dark"] .table {
+    --bs-table-bg: var(--suptech-surface);
+    --bs-table-color: var(--suptech-on-surface);
+    --bs-table-border-color: var(--suptech-outline-variant);
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.05);
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.075);
+}
+
+[data-bs-theme="dark"] .card,
+[data-bs-theme="dark"] .module-card,
+[data-bs-theme="dark"] .dropdown-menu {
+    background-color: var(--suptech-surface) !important;
+    color: var(--suptech-on-surface) !important;
+    border-color: var(--suptech-outline-variant) !important;
+}
+
+[data-bs-theme="dark"] .dropdown-item {
+    color: var(--suptech-on-surface);
+}
+
+[data-bs-theme="dark"] .dropdown-item:hover {
+    background-color: var(--suptech-surface-variant);
+    color: var(--suptech-on-surface);
+}
+

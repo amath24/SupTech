@@ -6,7 +6,7 @@ require_once __DIR__ . '/include/config.php';
 $pageTitle = 'Connexion';
 $layout = 'login';
 
-$logoUrl = 'https://lh3.googleusercontent.com/aida/AP1WRLtzoZ2rcpMxMScovgaHRyc7GYXZ38veD2Icj5ryxozctkkqhQgiVxtyGP3X3oUVUx665NG_e-7F3cQxWJFoxm1DxKC5kz597JAPjIPkOFtdvQDvcXzFYjRi8-_UOKz5efA5xZSUR1zHF0CH5X1b3PY-vwvhMFhMN31PMuQEjmDm4yCbDlIy5zpvq0CLObjS7CwKt7pLVkeKKXzNt4faSKXdsdR-dQRaclSR4QH20G7KZxp76JlG1XnWbi24';
+$logoUrl = asset('image/LOGO.png');
 
 // Récupérer le message d'erreur s'il existe
 $error = isset($_SESSION['error']) ? $_SESSION['error'] : '';

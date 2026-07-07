@@ -7,7 +7,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 $activePage = $activePage ?? '';
 $menuItems = getMenuItems();
-$logoUrl = 'https://lh3.googleusercontent.com/aida/AP1WRLtzoZ2rcpMxMScovgaHRyc7GYXZ38veD2Icj5ryxozctkkqhQgiVxtyGP3X3oUVUx665NG_e-7F3cQxWJFoxm1DxKC5kz597JAPjIPkOFtdvQDvcXzFYjRi8-_UOKz5efA5xZSUR1zHF0CH5X1b3PY-vwvhMFhMN31PMuQEjmDm4yCbDlIy5zpvq0CLObjS7CwKt7pLVkeKKXzNt4faSKXdsdR-dQRaclSR4QH20G7KZxp76JlG1XnWbi24';
+$logoUrl = asset('image/LOGO.png');
 $userRole = $_SESSION['user_role'] ?? 'Utilisateur';
 ?>
 <!-- Sidebar -->
@@ -15,7 +15,7 @@ $userRole = $_SESSION['user_role'] ?? 'Utilisateur';
     <div class="sidebar-header">
         <img src="<?= $logoUrl ?>" alt="Logo SupTech" class="sidebar-logo">
         <div class="sidebar-brand">
-            <h1 class="sidebar-title"><?= APP_NAME ?></h1>
+
             <div class="mt-2">
                 <span class="badge" style="background-color: rgba(255,255,255,0.2); color: #6cf8bb; padding: 0.4rem 0.8rem; font-size: 0.8rem; letter-spacing: 0.5px; text-transform: uppercase;">
                     <?= htmlspecialchars($userRole) ?>
