@@ -6,7 +6,7 @@ require_once __DIR__ . '/include/config.php';
 $pageTitle = 'Connexion';
 $layout = 'login';
 
-$logoUrl = asset('image/LOGO.png');
+$logoUrl = asset('image/screen.png');
 
 // Récupérer le message d'erreur s'il existe
 $error = isset($_SESSION['error']) ? $_SESSION['error'] : '';

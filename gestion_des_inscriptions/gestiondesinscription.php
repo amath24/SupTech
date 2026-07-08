@@ -210,6 +210,12 @@ require_once __DIR__ . '/../include/head.php';
                                 <td><?= date('d/m/Y', strtotime($insc['date_inscription'])) ?></td>
                                 <td class="text-end">
                                     <div class="table-actions d-flex justify-content-end gap-1">
+                                        <a href="imprimer_recu_inscription.php?id=<?= $insc['id_inscription'] ?>" target="_blank" class="btn btn-sm btn-link text-primary p-1" title="Imprimer l'attestation">
+                                            <span class="material-symbols-outlined" style="font-size: 18px;">print</span>
+                                        </a>
+                                        <a href="imprimer_recu_inscription.php?id=<?= $insc['id_inscription'] ?>&download=1" class="btn btn-sm btn-link text-success p-1" title="Télécharger l'attestation">
+                                            <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
+                                        </a>
                                         <button type="button" class="btn btn-sm btn-link text-muted p-1" title="Voir le dossier" onclick="alert('Détails du dossier')">
                                             <span class="material-symbols-outlined" style="font-size: 18px;">folder_open</span>
                                         </button>

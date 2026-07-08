@@ -298,14 +298,10 @@ require_once __DIR__ . '/../include/head.php';
                             <?php endforeach; ?>
                         </select>
                     </form>
-                    <a href="?id_assignation=<?= $id_assignation ?>&export=1" class="btn btn-outline-suptech d-flex align-items-center gap-2">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
-                        Exporter
+                    <a href="../relev_de_notes/relvedenote.php" class="btn btn-primary-suptech d-flex align-items-center gap-2">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">description</span>
+                        Bulletins de notes
                     </a>
-                    <button type="submit" form="notesForm" class="btn btn-primary-suptech d-flex align-items-center gap-2">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">save</span>
-                        Enregistrer
-                    </button>
                 </div>
             </div>
 

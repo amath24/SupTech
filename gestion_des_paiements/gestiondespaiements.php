@@ -340,9 +340,12 @@ require_once __DIR__ . '/../include/head.php';
                                         <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-2 py-1">Validé</span>
                                     </td>
                                     <td class="text-center">
-                                        <button type="button" class="btn btn-sm btn-link text-primary p-1" title="Imprimer le reçu" onclick="alert('Impression à venir')">
+                                        <a href="imprimer_recu_paiement.php?id=<?= $p['id_paiement'] ?>" target="_blank" class="btn btn-sm btn-link text-primary p-1" title="Imprimer le reçu">
                                             <span class="material-symbols-outlined" style="font-size: 18px;">print</span>
-                                        </button>
+                                        </a>
+                                        <a href="imprimer_recu_paiement.php?id=<?= $p['id_paiement'] ?>&download=1" class="btn btn-sm btn-link text-success p-1" title="Télécharger le reçu">
+                                            <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
+                                        </a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

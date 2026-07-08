@@ -348,9 +348,10 @@ require_once __DIR__ . '/../include/head.php';
                             </div>
 
                             <div class="text-end">
-                                <button class="btn btn-primary-suptech" type="submit" <?= empty($modules) ? 'disabled' : '' ?>>
-                                    Enregistrer les Notes
-                                </button>
+                                <a href="../relev_de_notes/relvedenote.php" class="btn btn-primary-suptech d-flex align-items-center gap-2 d-inline-flex">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">description</span>
+                                    Bulletins de notes
+                                </a>
                             </div>
 
                         </form>
