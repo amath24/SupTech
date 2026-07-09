@@ -158,18 +158,37 @@ require_once __DIR__ . '/../include/head.php';
                             <tr>
                                 <td>
                                     <?php
+                                    // 1. Récupérer le nom de la photo depuis la base de données
                                     $photo = $etudiant['photo'];
-                                    if(empty($photo)) {
+
+                                    if (empty($photo)) {
+                                        // Aucune photo enregistrée : afficher un avatar avec les initiales
                                         $photoSrc = $defaultPhoto . urlencode($etudiant['prenom'] . ' ' . $etudiant['nom']);
-                                    } else if (strpos($photo, 'http') === 0) {
+                                        $photoExists = false;
+                                    } elseif (strpos($photo, 'http') === 0) {
+                                        // URL externe (ex: ancienne URL en ligne)
                                         $photoSrc = $photo;
+                                        $photoExists = true;
                                     } else {
-                                        $photoSrc = url($photo);
+                                        // 2. Chercher le fichier dans le dossier upload/etudiants/
+                                        $photoAbsPath = BASE_PATH . '/' . ltrim($photo, '/');
+                                        if (file_exists($photoAbsPath)) {
+                                            // 3. Le fichier existe → afficher via l'URL web
+                                            $photoSrc = url($photo);
+                                            $photoExists = true;
+                                        } else {
+                                            // Fichier introuvable → fallback avatar
+                                            $photoSrc = $defaultPhoto . urlencode($etudiant['prenom'] . ' ' . $etudiant['nom']);
+                                            $photoExists = false;
+                                        }
                                     }
                                     ?>
                                     <img src="<?= htmlspecialchars($photoSrc) ?>"
                                          alt="Photo <?= htmlspecialchars($etudiant['prenom'] . ' ' . $etudiant['nom']) ?>"
-                                         class="student-photo" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                                         class="student-photo"
+                                         style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid <?= $photoExists ? 'var(--suptech-primary)' : '#ccc' ?>;"
+                                         title="<?= htmlspecialchars($etudiant['prenom'] . ' ' . $etudiant['nom']) ?>"
+                                         onerror="this.onerror=null;this.src='<?= $defaultPhoto . urlencode($etudiant['prenom'] . ' ' . $etudiant['nom']) ?>';">
                                 </td>
                                 <td class="fw-medium"><?= htmlspecialchars($etudiant['matricule']) ?></td>
                                 <td class="fw-semibold"><?= htmlspecialchars($etudiant['nom']) ?></td>
@@ -185,13 +204,39 @@ require_once __DIR__ . '/../include/head.php';
                                 </td>
                                 <td class="text-end">
                                     <div class="table-actions d-flex justify-content-end gap-1">
-                                        <button type="button" class="btn btn-sm btn-link text-muted p-1" title="Voir" onclick="alert('Détails à venir')">
-                                            <span class="material-symbols-outlined" style="font-size: 18px;">visibility</span>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-link text-muted p-1" title="Modifier" onclick="alert('Modification à venir')">
+                                        <?php
+                                        // Préparer les data-attributes pour la modale de modification
+                                        $photoPreview = '';
+                                        if (!empty($etudiant['photo']) && strpos($etudiant['photo'], 'http') !== 0) {
+                                            $absP = BASE_PATH . '/' . ltrim($etudiant['photo'], '/');
+                                            $photoPreview = file_exists($absP) ? url($etudiant['photo']) : '';
+                                        } elseif (!empty($etudiant['photo'])) {
+                                            $photoPreview = $etudiant['photo'];
+                                        }
+                                        ?>
+                                        <button type="button"
+                                            class="btn btn-sm btn-link text-primary p-1"
+                                            title="Modifier"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editEtudiantModal"
+                                            data-id="<?= $etudiant['id_etudiant'] ?>"
+                                            data-nom="<?= htmlspecialchars($etudiant['nom'], ENT_QUOTES) ?>"
+                                            data-prenom="<?= htmlspecialchars($etudiant['prenom'], ENT_QUOTES) ?>"
+                                            data-date-naissance="<?= htmlspecialchars($etudiant['date_naissance'] ?? '', ENT_QUOTES) ?>"
+                                            data-sexe="<?= htmlspecialchars($etudiant['sexe'] ?? '', ENT_QUOTES) ?>"
+                                            data-telephone="<?= htmlspecialchars($etudiant['telephone'] ?? '', ENT_QUOTES) ?>"
+                                            data-email="<?= htmlspecialchars($etudiant['email'] ?? '', ENT_QUOTES) ?>"
+                                            data-adresse="<?= htmlspecialchars($etudiant['adresse'] ?? '', ENT_QUOTES) ?>"
+                                            data-id-classe="<?= $etudiant['id_classe'] ?? '' ?>"
+                                            data-photo-preview="<?= htmlspecialchars($photoPreview, ENT_QUOTES) ?>"
+                                            data-matricule="<?= htmlspecialchars($etudiant['matricule'], ENT_QUOTES) ?>"
+                                            onclick="ouvrirModalModif(this)">
                                             <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-link text-danger p-1" title="Supprimer" onclick="alert('Suppression à venir')">
+                                        <button type="button"
+                                            class="btn btn-sm btn-link text-danger p-1"
+                                            title="Supprimer"
+                                            onclick="confirmerSuppression(<?= $etudiant['id_etudiant'] ?>, '<?= htmlspecialchars($etudiant['prenom'] . ' ' . $etudiant['nom'], ENT_QUOTES) ?>')">
                                             <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
                                         </button>
                                     </div>
@@ -313,6 +358,213 @@ require_once __DIR__ . '/../include/head.php';
         </div>
     </div>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODALE DE MODIFICATION D'UN ÉTUDIANT
+═══════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="editEtudiantModal" tabindex="-1" aria-labelledby="editEtudiantModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow" style="border-radius: 0.75rem;">
+            <div class="modal-header text-white d-flex align-items-center gap-2" style="background: linear-gradient(135deg, #00236f 0%, #1a56db 100%); border-top-left-radius: 0.75rem; border-top-right-radius: 0.75rem;">
+                <span class="material-symbols-outlined">manage_accounts</span>
+                <h5 class="modal-title mb-0" id="editEtudiantModalLabel">Modifier l'étudiant</h5>
+                <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+
+            <form action="<?= url('gestion_des_etudiants/modifier_etudiant.php') ?>" method="POST" enctype="multipart/form-data" id="formModifEtudiant">
+                <input type="hidden" name="id_etudiant" id="edit_id_etudiant">
+
+                <div class="modal-body p-4">
+
+                    <!-- Aperçu photo + upload -->
+                    <div class="d-flex align-items-center gap-4 mb-4 p-3 rounded-3" style="background: #f8f9fa; border: 1px dashed #dee2e6;">
+                        <div class="position-relative" style="flex-shrink: 0;">
+                            <img id="edit_photo_preview"
+                                 src="https://ui-avatars.com/api/?background=random&color=fff&name=?"
+                                 alt="Aperçu photo"
+                                 style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--suptech-primary); box-shadow: 0 2px 8px rgba(0,0,0,.15);">
+                            <label for="edit_photo" class="position-absolute bottom-0 end-0 btn btn-sm btn-primary rounded-circle p-1" style="width:26px;height:26px;cursor:pointer;" title="Changer la photo">
+                                <span class="material-symbols-outlined" style="font-size:14px;line-height:1;">photo_camera</span>
+                            </label>
+                        </div>
+                        <div class="flex-grow-1">
+                            <label class="form-label fw-semibold small mb-1">Photo de l'étudiant</label>
+                            <input type="file" class="form-control form-control-sm" id="edit_photo" name="photo" accept="image/*" onchange="previewPhoto(this)">
+                            <div class="form-text">JPG, PNG, GIF, WEBP · max 2 Mo. Laisser vide pour conserver l'actuelle.</div>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" id="edit_supprimer_photo" name="supprimer_photo" value="1" onchange="toggleSupprimerPhoto(this)">
+                                <label class="form-check-label text-danger small" for="edit_supprimer_photo">Supprimer la photo actuelle</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Matricule (lecture seule) -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Matricule</label>
+                        <input type="text" class="form-control bg-light" id="edit_matricule" readonly style="font-family: monospace; font-weight: 600; color: var(--suptech-primary);">
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="edit_nom" class="form-label fw-semibold small">Nom <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="edit_nom" name="nom" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit_prenom" class="form-label fw-semibold small">Prénom <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="edit_prenom" name="prenom" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="edit_date_naissance" class="form-label fw-semibold small">Date de naissance <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="edit_date_naissance" name="date_naissance" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit_sexe" class="form-label fw-semibold small">Sexe <span class="text-danger">*</span></label>
+                            <select class="form-select" id="edit_sexe" name="sexe" required>
+                                <option value="">Sélectionner</option>
+                                <option value="M">Masculin (M)</option>
+                                <option value="F">Féminin (F)</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="edit_telephone" class="form-label fw-semibold small">Téléphone <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" id="edit_telephone" name="telephone" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit_email" class="form-label fw-semibold small">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="edit_email" name="email" required>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label for="edit_adresse" class="form-label fw-semibold small">Adresse <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="edit_adresse" name="adresse" required>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label for="edit_id_classe" class="form-label fw-semibold small">Classe <span class="text-danger">*</span></label>
+                            <select class="form-select" id="edit_id_classe" name="id_classe" required>
+                                <option value="">Sélectionner une classe</option>
+                                <?php foreach ($classes as $c): ?>
+                                    <option value="<?= $c['id_classe'] ?>">
+                                        <?= htmlspecialchars($c['nom'] . ' (' . $c['filiere'] . ')') ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light p-3" style="border-bottom-left-radius: 0.75rem; border-bottom-right-radius: 0.75rem;">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary-suptech d-flex align-items-center gap-2">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">save</span>
+                        Enregistrer les modifications
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modale de confirmation de suppression -->
+<div class="modal fade" id="deleteEtudiantModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow" style="border-radius: 0.75rem;">
+            <div class="modal-header" style="background: #fff3cd; border-top-left-radius: 0.75rem; border-top-right-radius: 0.75rem;">
+                <h5 class="modal-title d-flex align-items-center gap-2 text-warning">
+                    <span class="material-symbols-outlined">warning</span>
+                    Confirmer la suppression
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="mb-1">Vous êtes sur le point de supprimer :</p>
+                <p class="fw-bold text-danger fs-5 mb-0" id="delete_etudiant_nom"></p>
+                <p class="text-muted small mt-2">Cette action est irréversible. Toutes les données liées à cet étudiant seront supprimées.</p>
+            </div>
+            <div class="modal-footer p-3">
+                <form action="<?= url('gestion_des_etudiants/supprimer_etudiant.php') ?>" method="POST">
+                    <input type="hidden" name="id_etudiant" id="delete_id_etudiant">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-danger d-flex align-items-center gap-2">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">delete_forever</span>
+                        Supprimer définitivement
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+/**
+ * Pré-remplit la modale de modification avec les données de la ligne cliquée
+ */
+function ouvrirModalModif(btn) {
+    const defaultAvatar = 'https://ui-avatars.com/api/?background=random&color=fff&name=';
+
+    document.getElementById('edit_id_etudiant').value      = btn.dataset.id;
+    document.getElementById('edit_matricule').value        = btn.dataset.matricule;
+    document.getElementById('edit_nom').value              = btn.dataset.nom;
+    document.getElementById('edit_prenom').value           = btn.dataset.prenom;
+    document.getElementById('edit_date_naissance').value   = btn.dataset.dateNaissance;
+    document.getElementById('edit_sexe').value             = btn.dataset.sexe;
+    document.getElementById('edit_telephone').value        = btn.dataset.telephone;
+    document.getElementById('edit_email').value            = btn.dataset.email;
+    document.getElementById('edit_adresse').value          = btn.dataset.adresse;
+    document.getElementById('edit_id_classe').value        = btn.dataset.idClasse;
+
+    // Aperçu photo
+    const preview  = document.getElementById('edit_photo_preview');
+    const photoUrl = btn.dataset.photoPreview;
+    preview.src = photoUrl || (defaultAvatar + encodeURIComponent((btn.dataset.prenom + ' ' + btn.dataset.nom).trim()));
+
+    // Réinitialiser le champ fichier et la case à cocher
+    document.getElementById('edit_photo').value = '';
+    document.getElementById('edit_supprimer_photo').checked = false;
+    preview.style.opacity = '1';
+}
+
+/**
+ * Aperçu immédiat de la nouvelle photo sélectionnée
+ */
+function previewPhoto(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            document.getElementById('edit_photo_preview').src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+        document.getElementById('edit_supprimer_photo').checked = false;
+    }
+}
+
+/**
+ * Gérer la case «Supprimer la photo»
+ */
+function toggleSupprimerPhoto(checkbox) {
+    const preview = document.getElementById('edit_photo_preview');
+    if (checkbox.checked) {
+        const nom    = document.getElementById('edit_nom').value;
+        const prenom = document.getElementById('edit_prenom').value;
+        preview.src = 'https://ui-avatars.com/api/?background=cccccc&color=fff&name=' + encodeURIComponent(prenom + ' ' + nom);
+        preview.style.opacity = '0.5';
+        document.getElementById('edit_photo').value = ''; // vider le champ fichier
+    } else {
+        preview.style.opacity = '1';
+    }
+}
+
+/**
+ * Ouvre la modale de confirmation de suppression
+ */
+function confirmerSuppression(idEtudiant, nomComplet) {
+    document.getElementById('delete_id_etudiant').value = idEtudiant;
+    document.getElementById('delete_etudiant_nom').textContent = nomComplet;
+    new bootstrap.Modal(document.getElementById('deleteEtudiantModal')).show();
+}
+</script>
 
 <?php require_once __DIR__ . '/../include/footer.php'; ?>
 </body>

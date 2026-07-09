@@ -48,6 +48,42 @@
     box-sizing: border-box;
 }
 
+/* ---- Défilement des modales ---- */
+/* Problème : <form> entre modal-content et modal-body casse la chaine flex Bootstrap.
+   Solution : forcer le form à se comporter comme un flex-container transparent */
+#editEtudiantModal .modal-dialog {
+    max-height: 90vh;
+    margin-top: 5vh;
+    margin-bottom: 5vh;
+}
+
+#editEtudiantModal .modal-content {
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Clé de la correction : le <form> qui enveloppe modal-body + modal-footer */
+#editEtudiantModal .modal-content > form {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    overflow: hidden;
+    min-height: 0;
+}
+
+#editEtudiantModal .modal-body {
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+#editEtudiantModal .modal-footer {
+    flex-shrink: 0;
+}
+
 body {
     font-family: var(--suptech-font);
     background-color: var(--suptech-background);
