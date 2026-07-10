@@ -58,6 +58,38 @@ $stmtCount->execute($params);
 $totalEtudiants = $stmtCount->fetchColumn();
 $totalPages = ceil($totalEtudiants / $limit);
 
+// Export Excel / CSV
+if (isset($_GET['export'])) {
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="liste_etudiants.csv"');
+    $out = fopen('php://output', 'w');
+    fputs($out, "\xEF\xBB\xBF"); // BOM pour UTF-8 (Excel)
+    fputcsv($out, ['Matricule', 'Nom', 'Prenom', 'Classe', 'Sexe', 'Telephone', 'Email'], ';');
+    
+    // Fetch all without limit for export
+    $exportQueryStr = "SELECT e.*, c.nom as classe_nom FROM etudiants e LEFT JOIN classes c ON e.id_classe = c.id_classe";
+    if (!empty($whereClauses)) {
+        $exportQueryStr .= " WHERE " . implode(" AND ", $whereClauses);
+    }
+    $exportQueryStr .= " ORDER BY e.nom, e.prenom";
+    $stmtExp = $db->prepare($exportQueryStr);
+    $stmtExp->execute($params);
+    
+    while ($row = $stmtExp->fetch()) {
+        fputcsv($out, [
+            $row['matricule'],
+            $row['nom'],
+            $row['prenom'],
+            $row['classe_nom'] ?? 'Non assigné',
+            $row['sexe'] ?? '',
+            $row['telephone'] ?? '',
+            $row['email'] ?? ''
+        ], ';');
+    }
+    fclose($out);
+    exit;
+}
+
 // Récupération des classes pour les filtres et le formulaire d'ajout
 $classes = $db->query("SELECT id_classe, nom, niveau, filiere FROM classes ORDER BY niveau, nom")->fetchAll();
 
@@ -79,10 +111,16 @@ require_once __DIR__ . '/../include/head.php';
                 <h2 class="page-title" style="font-size: 1.5rem;">Gestion des Étudiants</h2>
                 <p class="page-subtitle mb-0">Gérez la liste complète des étudiants inscrits pour l'année académique en cours.</p>
             </div>
-            <button type="button" class="btn btn-primary-suptech d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#addEtudiantModal">
-                <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
-                Ajouter un étudiant
-            </button>
+            <div class="d-flex gap-2">
+                <a href="?export=1&search=<?= urlencode($search) ?>&classe=<?= urlencode($id_classe_filter) ?>" class="btn btn-success d-flex align-items-center gap-2">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
+                    Exporter Excel
+                </a>
+                <button type="button" class="btn btn-primary-suptech d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#addEtudiantModal">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+                    Ajouter un étudiant
+                </button>
+            </div>
         </div>
 
         <!-- Notifications flash -->

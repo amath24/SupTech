@@ -1,0 +1,212 @@
+[
+    {
+        "id": "6a511670bdec9",
+        "date": "2026-07-10 15:57:36",
+        "adresse_ip": "::1",
+        "utilisateur_id": 12,
+        "nom_complet": "Boubacar Boris Diop_B",
+        "role": "Enseignant",
+        "action": "Connexion",
+        "details": "L'utilisateur s'est connecté avec succès."
+    },
+    {
+        "id": "6a51166c32638",
+        "date": "2026-07-10 15:57:32",
+        "adresse_ip": "::1",
+        "utilisateur_id": 2,
+        "nom_complet": "SupTech Admin",
+        "role": "Administrateur",
+        "action": "Déconnexion",
+        "details": "L'utilisateur s'est déconnecté."
+    },
+    {
+        "id": "6a511617a6bab",
+        "date": "2026-07-10 15:56:07",
+        "adresse_ip": "::1",
+        "utilisateur_id": 2,
+        "nom_complet": "SupTech Admin",
+        "role": "Administrateur",
+        "action": "Connexion",
+        "details": "L'utilisateur s'est connecté avec succès."
+    },
+    {
+        "id": "6a511609a82fe",
+        "date": "2026-07-10 15:55:53",
+        "adresse_ip": "::1",
+        "utilisateur_id": 12,
+        "nom_complet": "Boubacar Boris Diop_B",
+        "role": "Enseignant",
+        "action": "Connexion",
+        "details": "L'utilisateur s'est connecté avec succès."
+    },
+    {
+        "id": "6a51156063871",
+        "date": "2026-07-10 15:53:04",
+        "adresse_ip": "::1",
+        "utilisateur_id": null,
+        "nom_complet": "Inconnu",
+        "role": "Inconnu",
+        "action": "Échec de connexion",
+        "details": "Tentative de connexion échouée pour l'email : b.diop@suptech.edu"
+    },
+    {
+        "id": "6a51154504809",
+        "date": "2026-07-10 15:52:37",
+        "adresse_ip": "::1",
+        "utilisateur_id": null,
+        "nom_complet": "Inconnu",
+        "role": "Inconnu",
+        "action": "Échec de connexion",
+        "details": "Tentative de connexion échouée pour l'email : b.diop@suptech.edu"
+    },
+    {
+        "id": "6a5115321fbad",
+        "date": "2026-07-10 15:52:18",
+        "adresse_ip": "::1",
+        "utilisateur_id": null,
+        "nom_complet": "Inconnu",
+        "role": "Inconnu",
+        "action": "Échec de connexion",
+        "details": "Tentative de connexion échouée pour l'email : b.diop@suptech.edu"
+    },
+    {
+        "id": "6a51151d4cf86",
+        "date": "2026-07-10 15:51:57",
+        "adresse_ip": "::1",
+        "utilisateur_id": 15,
+        "nom_complet": "Khady Sylla",
+        "role": "Enseignant",
+        "action": "Déconnexion",
+        "details": "L'utilisateur s'est déconnecté."
+    },
+    {
+        "id": "6a5114a700fd9",
+        "date": "2026-07-10 15:49:59",
+        "adresse_ip": "::1",
+        "utilisateur_id": 15,
+        "nom_complet": "Khady Sylla",
+        "role": "Enseignant",
+        "action": "Connexion",
+        "details": "L'utilisateur s'est connecté avec succès."
+    },
+    {
+        "id": "6a5113f0a60cc",
+        "date": "2026-07-10 15:46:56",
+        "adresse_ip": "::1",
+        "utilisateur_id": null,
+        "nom_complet": "Inconnu",
+        "role": "Inconnu",
+        "action": "Échec de connexion",
+        "details": "Tentative de connexion échouée pour l'email : amathalain2004@gmail.com"
+    },
+    {
+        "id": "6a5113d881dba",
+        "date": "2026-07-10 15:46:32",
+        "adresse_ip": "::1",
+        "utilisateur_id": 2,
+        "nom_complet": "SupTech Admin",
+        "role": "Administrateur",
+        "action": "Déconnexion",
+        "details": "L'utilisateur s'est déconnecté."
+    },
+    {
+        "id": "6a51137d5732d",
+        "date": "2026-07-10 15:45:01",
+        "adresse_ip": "::1",
+        "utilisateur_id": 2,
+        "nom_complet": "SupTech Admin",
+        "role": "Administrateur",
+        "action": "Ajout utilisateur",
+        "details": "Ajout de l'utilisateur mamad ly (mamad@gmail.com)"
+    },
+    {
+        "id": "6a5112ccbd2fc",
+        "date": "2026-07-10 15:42:04",
+        "adresse_ip": "::1",
+        "utilisateur_id": 2,
+        "nom_complet": "SupTech Admin",
+        "role": "Administrateur",
+        "action": "Connexion",
+        "details": "L'utilisateur s'est connecté avec succès."
+    },
+    {
+        "id": "6a5111abeb0ce",
+        "date": "2026-07-10 15:37:15",
+        "adresse_ip": "::1",
+        "utilisateur_id": null,
+        "nom_complet": "Inconnu",
+        "role": "Inconnu",
+        "action": "Échec de connexion",
+        "details": "Tentative de connexion échouée pour l'email : k.sylla@suptech.edu"
+    },
+    {
+        "id": "6a511174bc115",
+        "date": "2026-07-10 15:36:20",
+        "adresse_ip": "::1",
+        "utilisateur_id": null,
+        "nom_complet": "Inconnu",
+        "role": "Inconnu",
+        "action": "Échec de connexion",
+        "details": "Tentative de connexion échouée pour l'email : o.sembene@suptech.edu"
+    },
+    {
+        "id": "6a5110653bb4c",
+        "date": "2026-07-10 15:31:49",
+        "adresse_ip": "::1",
+        "utilisateur_id": null,
+        "nom_complet": "Inconnu",
+        "role": "Inconnu",
+        "action": "Échec de connexion",
+        "details": "Tentative de connexion échouée pour l'email : c.diop@suptech.edu"
+    },
+    {
+        "id": "6a51101f4f23e",
+        "date": "2026-07-10 15:30:39",
+        "adresse_ip": "::1",
+        "utilisateur_id": null,
+        "nom_complet": "Inconnu",
+        "role": "Inconnu",
+        "action": "Échec de connexion",
+        "details": "Tentative de connexion échouée pour l'email : c.diop@suptech.edu"
+    },
+    {
+        "id": "6a510e217fdd9",
+        "date": "2026-07-10 15:22:09",
+        "adresse_ip": "::1",
+        "utilisateur_id": 2,
+        "nom_complet": "SupTech Admin",
+        "role": "Administrateur",
+        "action": "Déconnexion",
+        "details": "L'utilisateur s'est déconnecté."
+    },
+    {
+        "id": "6a510ac82a73f",
+        "date": "2026-07-10 15:07:52",
+        "adresse_ip": "::1",
+        "utilisateur_id": 2,
+        "nom_complet": "SupTech Admin",
+        "role": "Administrateur",
+        "action": "Connexion",
+        "details": "L'utilisateur s'est connecté avec succès."
+    },
+    {
+        "id": "6a510ac65460f",
+        "date": "2026-07-10 15:07:50",
+        "adresse_ip": "::1",
+        "utilisateur_id": 2,
+        "nom_complet": "SupTech Admin",
+        "role": "Administrateur",
+        "action": "Déconnexion",
+        "details": "L'utilisateur s'est déconnecté."
+    },
+    {
+        "id": "6a510ab2e047c",
+        "date": "2026-07-10 15:07:30",
+        "adresse_ip": "::1",
+        "utilisateur_id": 2,
+        "nom_complet": "SupTech Admin",
+        "role": "Administrateur",
+        "action": "Connexion",
+        "details": "L'utilisateur s'est connecté avec succès."
+    }
+]

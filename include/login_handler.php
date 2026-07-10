@@ -54,6 +54,7 @@ try {
 
     // 4. Vérification utilisateur et mot de passe
     if (!$user || !password_verify($password, $user['mot_de_passe'])) {
+        log_action('Échec de connexion', 'Tentative de connexion échouée pour l\'email : ' . $email);
         $_SESSION['error'] = 'Email ou mot de passe incorrect.';
         header('Location: ' . url('../index.php'));
         exit;
@@ -66,6 +67,8 @@ try {
     $_SESSION['user_role'] = $user['role'];
     $_SESSION['user_photo'] = $user['photo'] ?? null;
     unset($_SESSION['error']);
+
+    log_action('Connexion', 'L\'utilisateur s\'est connecté avec succès.', $user['id_utilisateur'], trim($user['prenom'] . ' ' . $user['nom']), $user['role']);
 
     // 6. Redirection selon le rôle
     $role = strtolower(trim($user['role']));

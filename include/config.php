@@ -4,6 +4,8 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+require_once __DIR__ . '/logger.php';
+
 /**
  * Configuration globale SupTech
  */
@@ -51,6 +53,7 @@ function getMenuItems(): array
             ['id' => 'paiements',       'label' => 'Paiements',        'icon' => 'payments',        'url' => url('gestion_des_paiements/gestiondespaiements.php')],
             ['id' => 'notes',           'label' => 'Notes',            'icon' => 'description',     'url' => url('gestion_des_notes_enseignant/gestiondesnote.php')],
             ['id' => 'emploi_du_temps', 'label' => 'Emploi du temps',  'icon' => 'calendar_today',  'url' => url('emploi_du_temps/emploi_du_temps.php')],
+            ['id' => 'journaux',        'label' => 'Journaux d\'activités', 'icon' => 'history',    'url' => url('gestion_des_journaux/gestiondesjournaux.php')],
             ['id' => 'statistiques',    'label' => 'Statistiques',     'icon' => 'query_stats',     'url' => url('statistique/statistique.php')],
         ];
     }

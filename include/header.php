@@ -26,6 +26,12 @@ $userPhoto = $_SESSION['user_photo'] ?? null;
             <span class="material-symbols-outlined theme-icon-dark">dark_mode</span>
         </button>
         
+        <?php if (strtolower(trim($_SESSION['user_role'] ?? '')) === 'administrateur'): ?>
+        <a href="<?= url('gestion_des_utilisateurs/gestiondesutilisateurs.php') ?>" class="btn btn-icon" aria-label="Paramètres utilisateurs" title="Gestion des utilisateurs">
+            <span class="material-symbols-outlined">settings</span>
+        </a>
+        <?php endif; ?>
+
         <button class="btn btn-icon position-relative" type="button" aria-label="Notifications">
             <span class="material-symbols-outlined">notifications</span>
             <span class="notification-dot"></span>

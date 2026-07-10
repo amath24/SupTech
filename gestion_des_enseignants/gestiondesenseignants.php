@@ -58,6 +58,30 @@ $stmt = $db->prepare($queryStr);
 $stmt->execute($params);
 $enseignants = $stmt->fetchAll();
 
+// Export Excel / CSV
+if (isset($_GET['export'])) {
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="liste_enseignants.csv"');
+    $out = fopen('php://output', 'w');
+    fputs($out, "\xEF\xBB\xBF"); // BOM pour UTF-8
+    fputcsv($out, ['Matricule', 'Nom', 'Prenom', 'Email', 'Telephone', 'Grade', 'Specialite', 'Matieres'], ';');
+    
+    foreach ($enseignants as $row) {
+        fputcsv($out, [
+            $row['matricule'],
+            $row['nom'],
+            $row['prenom'],
+            $row['email'] ?? '',
+            $row['telephone'] ?? '',
+            $row['grade'] ?? '',
+            $row['specialite'] ?? '',
+            $row['matieres'] ?? ''
+        ], ';');
+    }
+    fclose($out);
+    exit;
+}
+
 // Get next matricule for Add Modal (informational only, backend will generate the final one)
 $year = date('Y');
 $stmt_last = $db->query("SELECT matricule FROM enseignants WHERE matricule LIKE 'ENS-$year-%' ORDER BY matricule DESC LIMIT 1");
@@ -87,10 +111,16 @@ require_once __DIR__ . '/../include/head.php';
                     <h1 class="page-title">Gestion des Enseignants</h1>
                     <p class="page-subtitle mb-0">Gérez la liste complète du personnel enseignant et leurs spécialités.</p>
                 </div>
-                <button type="button" class="btn btn-primary-suptech d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
-                    <span class="material-symbols-outlined" style="font-size: 20px;">add</span>
-                    Ajouter un enseignant
-                </button>
+                <div class="d-flex gap-2">
+                    <a href="?export=1&search=<?= urlencode($search) ?>&specialite=<?= urlencode($specialite_filter) ?>&module=<?= urlencode($module_filter) ?>" class="btn btn-success d-flex align-items-center gap-2">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
+                        Exporter Excel
+                    </a>
+                    <button type="button" class="btn btn-primary-suptech d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">add</span>
+                        Ajouter un enseignant
+                    </button>
+                </div>
             </div>
 
             <!-- Notifications flash -->
