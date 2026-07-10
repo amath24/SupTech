@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : sam. 04 juil. 2026 à 18:28
+-- Généré le : ven. 10 juil. 2026 à 15:59
 -- Version du serveur : 8.4.7
 -- Version de PHP : 8.3.28
 
@@ -62,18 +62,34 @@ CREATE TABLE IF NOT EXISTS `assignation_modules` (
   KEY `idx_assignation_enseignant` (`id_enseignant`),
   KEY `idx_assignation_classe` (`id_classe`),
   KEY `idx_assignation_annee` (`id_annee`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `assignation_modules`
 --
 
 INSERT INTO `assignation_modules` (`id_assignation`, `id_module`, `id_enseignant`, `id_classe`, `id_annee`) VALUES
-(1, 1, 1, 1, 1),
-(2, 2, 1, 2, 1),
-(3, 3, 1, 3, 1),
-(4, 6, 2, 6, 1),
-(5, 7, 2, 7, 1);
+(1, 1, 2, 1, 1),
+(2, 2, 6, 1, 1),
+(3, 3, 1, 1, 1),
+(4, 4, 3, 1, 1),
+(5, 5, 4, 2, 1),
+(6, 6, 9, 2, 1),
+(7, 7, 7, 2, 1),
+(8, 8, 10, 2, 1),
+(9, 9, 8, 3, 1),
+(10, 10, 1, 3, 1),
+(11, 11, 3, 3, 1),
+(12, 12, 5, 3, 1),
+(13, 13, 2, 4, 1),
+(14, 14, 8, 4, 1),
+(15, 15, 10, 4, 1),
+(16, 16, 7, 4, 1),
+(17, 17, 1, 5, 1),
+(18, 18, 4, 5, 1),
+(19, 19, 9, 5, 1),
+(20, 20, 5, 5, 1),
+(21, 21, 10, 4, 1);
 
 -- --------------------------------------------------------
 
@@ -96,13 +112,11 @@ CREATE TABLE IF NOT EXISTS `classes` (
 --
 
 INSERT INTO `classes` (`id_classe`, `nom`, `filiere`, `niveau`, `effectif_max`) VALUES
-(1, 'L1 Génie Logiciel', 'Informatique', 'Licence 1', 45),
-(2, 'L2 Systèmes & Réseaux', 'Informatique', 'Licence 2', 40),
-(3, 'L3 Big Data & IA', 'Informatique', 'Licence 3', 35),
-(4, 'M1 Cybersécurité', 'Informatique', 'Master 1', 25),
-(5, 'M2 Management des SI', 'Sciences de Gestion', 'Master 2', 20),
-(6, 'L1 Management Stratégique', 'Sciences de Gestion', 'Licence 1', 50),
-(7, 'L3 Marketing Digital', 'Sciences de Gestion', 'Licence 3', 30);
+(1, 'L3 Génie Logiciel', 'Informatique et Développement', 'L3', 40),
+(2, 'M1 Cybersécurité', 'Sécurité Informatique', 'M1', 40),
+(3, 'L1 Informatique de Gestion', 'Business & IT', 'L1', 50),
+(4, 'L2 Web & Mobile', 'Informatique et Développement', 'L2', 45),
+(5, 'M2 Data Science', 'Intelligence Artificielle', 'M2', 30);
 
 -- --------------------------------------------------------
 
@@ -128,8 +142,11 @@ CREATE TABLE IF NOT EXISTS `emploi_temps` (
 --
 
 INSERT INTO `emploi_temps` (`id_seance`, `jour`, `heure_debut`, `heure_fin`, `id_salle`, `id_assignation`) VALUES
-(1, 'Lundi', '08:30:00', '12:30:00', 2, 1),
-(2, 'Mercredi', '14:00:00', '17:00:00', 1, 4);
+(1, 'Lundi', '08:30:00', '11:45:00', 2, 1),
+(2, 'Mardi', '14:00:00', '17:15:00', 1, 5),
+(3, 'Mercredi', '08:30:00', '11:45:00', 4, 11),
+(4, 'Jeudi', '14:00:00', '17:15:00', 2, 13),
+(5, 'Vendredi', '08:30:00', '11:45:00', 3, 17);
 
 -- --------------------------------------------------------
 
@@ -153,7 +170,7 @@ CREATE TABLE IF NOT EXISTS `enseignants` (
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `id_utilisateur` (`id_utilisateur`),
   KEY `idx_enseignant_nom` (`nom`,`prenom`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `enseignants`
@@ -161,7 +178,18 @@ CREATE TABLE IF NOT EXISTS `enseignants` (
 
 INSERT INTO `enseignants` (`id_enseignant`, `matricule`, `nom`, `prenom`, `grade`, `telephone`, `email`, `specialite`, `id_utilisateur`) VALUES
 (1, 'ENS-2026-001', 'Kamara', 'Ibrahima', 'Professeur', '775551122', 'ibrahima.kamara@suptech.sn', 'Génie Logiciel & Sécurité', NULL),
-(2, 'ENS-2026-002', 'Diallo', 'Aissatou', 'Maître de Conférences', '775553344', 'aissatou.diallo@suptech.sn', 'Management & Digital', NULL);
+(2, 'ENS-2026-002', 'Diallo', 'Aissatou', 'Maître de Conférences', '775553344', 'aissatou.diallo@suptech.sn', 'Management & Digital', NULL),
+(3, 'ENS-2026-003', 'Seck', 'Amath', 'DOCTEUR', '7578900', 'amath@gmail.com', 'COMPTA', 5),
+(4, 'ENS202601', 'Diop', 'Cheikh Anta', 'Professeur Titulaire', '+221771234567', 'c.diop@suptech.edu', 'Base de données', 6),
+(5, 'ENS202602', 'Bâ', 'Mariama', 'Maître de Conférences', '+221772345678', 'm.ba@suptech.edu', 'Développement Web', 7),
+(6, 'ENS202603', 'Sembène', 'Ousmane', 'Assistant', '+221773456789', 'o.sembene@suptech.edu', 'Algorithmique & C', 8),
+(7, 'ENS202604', 'Sow Fall', 'Aminata', 'Maître de Conférences', '+221774567890', 'a.sowfall@suptech.edu', 'Systèmes & Virtualisation', 9),
+(8, 'ENS202605', 'Senghor', 'Léopold', 'Professeur Titulaire', '+221775678901', 'l.senghor@suptech.edu', 'Mathématiques Financières', 10),
+(9, 'ENS202606', 'Diome', 'Fatou', 'Assistant', '+221776789012', 'f.diome@suptech.edu', 'Applications Mobiles', 11),
+(10, 'ENS202607', 'Diop_B', 'Boubacar Boris', 'Maître de Conférences', '+221777890123', 'b.diop@suptech.edu', 'Réseaux & Sécurité', 12),
+(11, 'ENS202608', 'Bugul', 'Ken', 'Assistant', '+221778901234', 'k.bugul@suptech.edu', 'Interface Homme-Machine', 13),
+(12, 'ENS202609', 'Sarr', 'Felwine', 'Professeur Titulaire', '+221779012345', 'f.sarr@suptech.edu', 'Économie Numérique', 14),
+(13, 'ENS202610', 'Sylla', 'Khady', 'Maître de Conférences', '+221770123456', 'k.sylla@suptech.edu', 'Génie Logiciel', 15);
 
 -- --------------------------------------------------------
 
@@ -187,20 +215,48 @@ CREATE TABLE IF NOT EXISTS `etudiants` (
   UNIQUE KEY `email` (`email`),
   KEY `fk_etudiant_classe` (`id_classe`),
   KEY `idx_etudiant_nom` (`nom`,`prenom`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `etudiants`
 --
 
 INSERT INTO `etudiants` (`id_etudiant`, `matricule`, `nom`, `prenom`, `date_naissance`, `sexe`, `telephone`, `email`, `adresse`, `photo`, `id_classe`) VALUES
-(1, 'SUP-2026-0001', 'Diop', 'Moussa', '2005-04-12', 'M', '771234567', 'moussa.diop@suptech.sn', 'Keur Massar', NULL, 1),
-(2, 'SUP-2026-0002', 'Ndiaye', 'Fatou', '2004-08-19', 'F', '772345678', 'fatou.ndiaye@suptech.sn', 'Rufisque', NULL, 2),
-(3, 'SUP-2026-0003', 'Sane', 'Amadou', '2003-11-05', 'M', '773456789', 'amadou.sane@suptech.sn', 'Parcelles', NULL, 3),
-(4, 'SUP-2026-0004', 'Fall', 'Khady', '2001-02-14', 'F', '774567890', 'khady.fall@suptech.sn', 'Fann', NULL, 4),
-(5, 'SUP-2026-0005', 'Sow', 'Ousmane', '2000-07-27', 'M', '775678901', 'ousmane.sow@suptech.sn', 'Medina', NULL, 5),
-(6, 'SUP-2026-0006', 'Cisse', 'Awa', '2005-12-01', 'F', '776789012', 'awa.cisse@suptech.sn', 'Pikine', NULL, 6),
-(7, 'SUP-2026-0007', 'Ba', 'Ibrahima', '2004-05-30', 'M', '777890123', 'ibrahima.ba@suptech.sn', 'Guédiawaye', NULL, 7);
+(1, 'ETU202601', 'Ndiaye', 'Moussa', '2004-03-12', 'M', '+221771001122', 'moussa.ndiaye@suptech.edu', 'Dakar', 'HOMME1', 1),
+(2, 'ETU202602', 'Diop', 'Ibrahima', '2003-07-22', 'M', '+221772002233', 'ibrahima.diop@suptech.edu', 'Pikine', 'HOMME2', 1),
+(3, 'ETU202603', 'Fall', 'Fatou', '2005-01-15', 'F', '+221773003344', 'fatou.fall@suptech.edu', 'Guédiawaye', 'FILLE1', 1),
+(4, 'ETU202604', 'Sané', 'Amadou', '2004-11-02', 'M', '+221774004455', 'amadou.sane@suptech.edu', 'Thiaroye', 'upload/etudiants/ETU202604_1783626969.jpg', 1),
+(5, 'ETU202605', 'Cissé', 'Awa', '2004-04-30', 'F', '+221775005566', 'awa.cisse@suptech.edu', 'Parcelles', 'upload/etudiants/ETU202605_1783626800.jpg', 1),
+(6, 'ETU202606', 'Gaye', 'Oumar', '2003-08-19', 'M', '+221776006677', 'oumar.gaye@suptech.edu', 'Rufisque', 'HOMME4', 1),
+(7, 'ETU202607', 'Diallo', 'Mariama', '2005-09-05', 'F', '+221777007788', 'mariama.diallo@suptech.edu', 'Mermoz', 'FILLE3', 1),
+(8, 'ETU202608', 'Sarr', 'Abdoulaye', '2002-02-10', 'M', '+221778008899', 'abdoulaye.sarr@suptech.edu', 'Yoff', 'HOMME5', 2),
+(9, 'ETU202609', 'Ba', 'Khadija', '2001-12-25', 'F', '+221779009900', 'khadija.ba@suptech.edu', 'Médina', 'upload/etudiants/ETU202609_1783626831.jpg', 2),
+(10, 'ETU202610', 'Seck', 'Babacar', '2002-06-14', 'M', '+221771110011', 'babacar.seck@suptech.edu', 'Fann', 'HOMME6', 2),
+(11, 'ETU202611', 'Sow', 'Aminata', '2003-04-08', 'F', '+221772220022', 'aminata.sow@suptech.edu', 'Ouakam', 'FILLE5', 2),
+(12, 'ETU202612', 'Mbacké', 'Serigne', '2001-10-11', 'M', '+221773330033', 'serigne.mbacke@suptech.edu', 'Touba', 'HOMME7', 2),
+(13, 'ETU202613', 'Kane', 'Aissatou', '2002-07-20', 'F', '+221774440044', 'aissatou.kane@suptech.edu', 'Almadies', 'FILLE6', 2),
+(14, 'ETU202614', 'Sy', 'Ramata', '2002-01-30', 'F', '+221775550055', 'ramata.sy@suptech.edu', 'Grand Yoff', 'FILLE7', 2),
+(15, 'ETU202615', 'Mané', 'Ousmane', '2006-05-14', 'M', '+221776660011', 'ousmane.mane@suptech.edu', 'Mbour', 'upload/etudiants/ETU202615_1783626954.jpg', 3),
+(16, 'ETU202616', 'Goudiaby', 'Salimata', '2005-11-20', 'F', '+221776660022', 'salimata.goudiaby@suptech.edu', 'Bignona', 'upload/etudiants/ETU202616_1783626785.jpg', 3),
+(17, 'ETU202617', 'Thiam', 'Cheikh', '2006-02-18', 'M', '+221776660033', 'cheikh.thiam@suptech.edu', 'Thies', 'upload/etudiants/ETU202617_1783626895.jpg', 3),
+(18, 'ETU202618', 'Niang', 'Penda', '2005-08-03', 'F', '+221776660044', 'penda.niang@suptech.edu', 'Saint-Louis', 'FILLE9', 3),
+(19, 'ETU202619', 'Diagne', 'Mustapha', '2006-07-29', 'M', '+221776660055', 'mustapha.diagne@suptech.edu', 'Dakar', 'upload/etudiants/ETU202619_1783626816.jpg', 3),
+(20, 'ETU202620', 'Samb', 'Anta', '2005-10-12', 'F', '+221776660066', 'anta.samb@suptech.edu', 'Kaolack', 'upload/etudiants/ETU202620_1783626989.jpg', 3),
+(21, 'ETU202621', 'Boye', 'Modou', '2005-12-01', 'M', '+221776660077', 'modou.boye@suptech.edu', 'Fatick', 'HOMME11', 3),
+(22, 'ETU202622', 'Badji', 'Lamine', '2004-09-11', 'M', '+221777770011', 'lamine.badji@suptech.edu', 'Ziguinchor', 'upload/etudiants/ETU202622_1783626939.jpg', 4),
+(23, 'ETU202623', 'Faty', 'Astou', '2005-04-05', 'F', '+221777770022', 'astou.faty@suptech.edu', 'Kolda', 'upload/etudiants/ETU202623_1783626866.jpg', 4),
+(24, 'ETU202624', 'Camara', 'Demba', '2003-12-30', 'M', '+221777770033', 'demba.camara@suptech.edu', 'Tambacounda', 'upload/etudiants/ETU202624_1783626878.jpg', 4),
+(25, 'ETU202625', 'Gueye', 'Seynabou', '2004-06-17', 'F', '+221777770044', 'seynabou.gueye@suptech.edu', 'Dakar', 'FILLE12', 4),
+(26, 'ETU202626', 'Tine', 'Birame', '2004-01-22', 'M', '+221777770055', 'birame.tine@suptech.edu', 'Diofior', 'upload/etudiants/ETU202626_1783626912.jpg', 4),
+(27, 'ETU202627', 'Lo', 'Ndeye', '2005-02-14', 'F', '+221777770066', 'ndeye.lo@suptech.edu', 'Louga', 'FILLE13', 4),
+(28, 'ETU202628', 'Deme', 'Mansour', '2003-10-05', 'M', '+221777770077', 'mansour.deme@suptech.edu', 'Richard-Toll', 'HOMME15', 4),
+(29, 'ETU202629', 'Traoré', 'Souleymane', '2002-05-19', 'M', '+221778880011', 'souleymane.traore@suptech.edu', 'Dakar', 'HOMME16', 5),
+(30, 'ETU202630', 'Badiane', 'Coumba', '2001-08-27', 'F', '+221778880022', 'coumba.badiane@suptech.edu', 'Bignona', 'FILLE14', 5),
+(31, 'ETU202631', 'Fall', 'Alioune', '2002-11-04', 'M', '+221778880033', 'alioune.fall2@suptech.edu', 'Thies', 'HOMME17', 5),
+(32, 'ETU202632', 'Kandji', 'Yacine', '2002-03-16', 'F', '+221778880044', 'yacine.kandji@suptech.edu', 'Rufisque', 'FILLE15', 5),
+(33, 'ETU202633', 'Gomis', 'Jean', '2001-01-25', 'M', '+221778880055', 'jean.gomis@suptech.edu', 'Oussouye', 'upload/etudiants/ETU202633_1783626738.jpg', 5),
+(34, 'ETU202634', 'Ciss', 'Khady', '2002-09-09', 'F', '+221778880066', 'khady.ciss@suptech.edu', 'Mbour', 'FILLE16', 5),
+(35, 'ETU202635', 'Ndour', 'Sokhna', '2001-07-12', 'F', '+221778880077', 'sokhna.ndour@suptech.edu', 'Fatick', 'upload/etudiants/ETU202635_1783626928.jpg', 5);
 
 -- --------------------------------------------------------
 
@@ -219,20 +275,48 @@ CREATE TABLE IF NOT EXISTS `inscriptions` (
   UNIQUE KEY `uq_inscription` (`id_etudiant`,`id_classe`,`id_annee`),
   KEY `fk_inscription_classe` (`id_classe`),
   KEY `fk_inscription_annee` (`id_annee`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `inscriptions`
 --
 
 INSERT INTO `inscriptions` (`id_inscription`, `date_inscription`, `id_etudiant`, `id_classe`, `id_annee`) VALUES
-(1, '2026-07-01', 1, 1, 1),
-(2, '2026-07-01', 2, 2, 1),
-(3, '2026-07-02', 3, 3, 1),
-(4, '2026-07-02', 4, 4, 1),
-(5, '2026-07-03', 5, 5, 1),
-(6, '2026-07-03', 6, 6, 1),
-(7, '2026-07-04', 7, 7, 1);
+(1, '2026-07-09', 1, 1, 1),
+(2, '2026-07-09', 2, 1, 1),
+(3, '2026-07-09', 3, 1, 1),
+(4, '2026-07-09', 4, 1, 1),
+(5, '2026-07-09', 5, 1, 1),
+(6, '2026-07-09', 6, 1, 1),
+(7, '2026-07-09', 7, 1, 1),
+(8, '2026-07-09', 8, 2, 1),
+(9, '2026-07-09', 9, 2, 1),
+(10, '2026-07-09', 10, 2, 1),
+(11, '2026-07-09', 11, 2, 1),
+(12, '2026-07-09', 12, 2, 1),
+(13, '2026-07-09', 13, 2, 1),
+(14, '2026-07-09', 14, 2, 1),
+(15, '2026-07-09', 15, 3, 1),
+(16, '2026-07-09', 16, 3, 1),
+(17, '2026-07-09', 17, 3, 1),
+(18, '2026-07-09', 18, 3, 1),
+(19, '2026-07-09', 19, 3, 1),
+(20, '2026-07-09', 20, 3, 1),
+(21, '2026-07-09', 21, 3, 1),
+(22, '2026-07-09', 22, 4, 1),
+(23, '2026-07-09', 23, 4, 1),
+(24, '2026-07-09', 24, 4, 1),
+(25, '2026-07-09', 25, 4, 1),
+(26, '2026-07-09', 26, 4, 1),
+(27, '2026-07-09', 27, 4, 1),
+(28, '2026-07-09', 28, 4, 1),
+(29, '2026-07-09', 29, 5, 1),
+(30, '2026-07-09', 30, 5, 1),
+(31, '2026-07-09', 31, 5, 1),
+(32, '2026-07-09', 32, 5, 1),
+(33, '2026-07-09', 33, 5, 1),
+(34, '2026-07-09', 34, 5, 1),
+(35, '2026-07-09', 35, 5, 1);
 
 -- --------------------------------------------------------
 
@@ -254,13 +338,27 @@ CREATE TABLE IF NOT EXISTS `modules` (
 --
 
 INSERT INTO `modules` (`id_module`, `nom`, `coefficient`, `nombre_heures`) VALUES
-(1, 'Algorithmique et Programmation', 3.0, 60),
-(2, 'Réseaux et Routage Cisco', 2.5, 45),
-(3, 'Programmation Python pour la Data', 4.0, 50),
-(4, 'Sécurité des Architectures Web', 3.5, 40),
-(5, 'Audit et Gouvernance des SI', 3.0, 30),
-(6, 'Comptabilité Générale', 2.0, 60),
-(7, 'Stratégie SEO et Acquisition', 2.5, 40);
+(1, 'Applications Web avec PHP / Laravel', 3.0, 60),
+(2, 'Développement Mobile React Native CLI', 4.0, 50),
+(3, 'Architecture des Bases de Données & SQL', 3.0, 45),
+(4, 'Algorithmique Avancée & Structures de données', 3.0, 40),
+(5, 'Sécurité des Systèmes et Virtualisation', 4.0, 50),
+(6, 'Cryptographie Appliquée', 3.0, 45),
+(7, 'Administration Réseaux et Scripts Shell', 3.0, 40),
+(8, 'Management de Projet Informatique', 2.0, 30),
+(9, 'Bureautique & Outils Collaboratifs', 2.0, 30),
+(10, 'Introduction aux Bases de Données', 3.0, 45),
+(11, 'Algorithmique de Base et Langage C', 4.0, 60),
+(12, 'Comptabilité Générale', 2.0, 40),
+(13, 'Développement Web Front-end (JavaScript)', 3.0, 50),
+(14, 'Conception UI/UX pour Mobile', 2.0, 30),
+(15, 'Programmation Orientée Objet (Java)', 4.0, 60),
+(16, 'Réseaux Informatiques Fondamentaux', 3.0, 45),
+(17, 'Machine Learning & Python', 4.0, 60),
+(18, 'Big Data & Écosystème Hadoop', 4.0, 50),
+(19, 'Visualisation des Données & BI', 3.0, 40),
+(20, 'Éthique et Droit des Données', 2.0, 24),
+(21, 'ROGRAMATION ORIENTER OBJET (java)', 4.0, 30);
 
 -- --------------------------------------------------------
 
@@ -289,8 +387,16 @@ CREATE TABLE IF NOT EXISTS `notes` (
 --
 
 INSERT INTO `notes` (`id_note`, `cc`, `tp`, `examen`, `id_etudiant`, `id_assignation`) VALUES
-(1, 14.50, 16.00, 13.00, 1, 1),
-(2, 11.00, 12.50, 15.00, 3, 3);
+(1, 15.00, 14.50, 13.00, 1, 1),
+(2, 12.00, 16.00, 11.50, 15, 11),
+(3, 14.00, 18.00, 15.00, 29, 17),
+(4, 12.00, 4.00, 14.00, 22, 14),
+(5, 14.00, 19.00, 10.50, 24, 14),
+(6, 10.00, 10.00, 16.00, 28, 14),
+(7, 7.00, 16.00, 17.50, 25, 14),
+(8, 8.00, 19.00, 17.00, 27, 14),
+(9, 20.00, 18.00, 19.00, 26, 14),
+(13, 17.00, 19.00, 16.50, 23, 14);
 
 -- --------------------------------------------------------
 
@@ -314,13 +420,11 @@ CREATE TABLE IF NOT EXISTS `paiements` (
 --
 
 INSERT INTO `paiements` (`id_paiement`, `montant_paye`, `date_paiement`, `mode_paiement`, `id_inscription`) VALUES
-(1, 50000.00, '2026-07-01', 'Wave', 1),
-(2, 60000.00, '2026-07-01', 'Orange Money', 2),
-(3, 75000.00, '2026-07-02', 'Especes', 3),
-(4, 80000.00, '2026-07-02', 'Wave', 4),
-(5, 90000.00, '2026-07-03', 'Orange Money', 5),
-(6, 50000.00, '2026-07-03', 'Wave', 6),
-(7, 70000.00, '2026-07-04', 'Especes', 7);
+(1, 250000.00, '2026-07-09', 'Wave', 1),
+(2, 300000.00, '2026-07-09', 'Orange Money', 8),
+(3, 200000.00, '2026-07-09', 'Especes', 15),
+(4, 350000.00, '2026-07-09', 'Virement bancaire', 22),
+(5, 500000.00, '2026-07-09', 'Wave', 29);
 
 -- --------------------------------------------------------
 
@@ -366,8 +470,9 @@ CREATE TABLE IF NOT EXISTS `salles` (
 
 INSERT INTO `salles` (`id_salle`, `nom`, `capacite`) VALUES
 (1, 'Salle A101', 50),
-(2, 'Labo Informatique 1', 30),
-(3, 'Amphi Platton', 120);
+(2, 'Labo Informatique', 30),
+(3, 'Amphi SupTech', 150),
+(4, 'Salle B202', 40);
 
 -- --------------------------------------------------------
 
@@ -385,19 +490,32 @@ CREATE TABLE IF NOT EXISTS `utilisateurs` (
   `statut` enum('actif','inactif') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'actif',
   `date_creation` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `id_role` int NOT NULL,
+  `photo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id_utilisateur`),
   UNIQUE KEY `email` (`email`),
   KEY `fk_utilisateur_role` (`id_role`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `utilisateurs`
 --
 
-INSERT INTO `utilisateurs` (`id_utilisateur`, `nom`, `prenom`, `email`, `mot_de_passe`, `statut`, `date_creation`, `id_role`) VALUES
-(2, 'Admin', 'SupTech', 'admin@suptech.sn', '$2y$10$SPIyRbz19NklkjY8djoB0O1Qy4uqVWExhv/nxWhpjF1n6CmZY1bCK', 'actif', '2026-07-03 23:12:38', 1),
-(3, 'Prof', 'Test', 'prof@suptech.sn', '$2y$10$GT5pDvXkwfTOfCvn/27xR.HDuZT2N0gKd84RtKs3BaSVBNZ2c7qIe', 'actif', '2026-07-03 23:12:38', 2),
-(4, 'Agent', 'Scolarite', 'scola@suptech.sn', '$2y$10$HkPgaVz4NEdIkYcuPPF6W.YISta4H1YcO79f4ym01DXv5Vd9yfAVK', 'actif', '2026-07-03 23:12:38', 3);
+INSERT INTO `utilisateurs` (`id_utilisateur`, `nom`, `prenom`, `email`, `mot_de_passe`, `statut`, `date_creation`, `id_role`, `photo`) VALUES
+(2, 'Admin', 'SupTech', 'admin@suptech.sn', '$2y$10$SPIyRbz19NklkjY8djoB0O1Qy4uqVWExhv/nxWhpjF1n6CmZY1bCK', 'actif', '2026-07-03 23:12:38', 1, NULL),
+(3, 'Prof', 'Test', 'prof@suptech.sn', '$2y$10$GT5pDvXkwfTOfCvn/27xR.HDuZT2N0gKd84RtKs3BaSVBNZ2c7qIe', 'actif', '2026-07-03 23:12:38', 2, NULL),
+(4, 'Agent', 'Scolarite', 'scola@suptech.sn', '$2y$10$HkPgaVz4NEdIkYcuPPF6W.YISta4H1YcO79f4ym01DXv5Vd9yfAVK', 'actif', '2026-07-03 23:12:38', 3, NULL),
+(5, 'Seck', 'Amath', 'amath@gmail.com', '$2y$10$GFI/3HSWpGMVsAvOWGgUjOEadWQc1XAMXGmvjGBGa/PBsLRoQilKy', 'actif', '2026-07-06 14:34:56', 2, NULL),
+(6, 'Diop', 'Cheikh Anta', 'c.diop@suptech.edu', '$2y$10$oylgA7bRJBCBeq1WF4bjs.0vyE2S.OFmdvvVdr3UvvMTk3bY2ioPu', 'actif', '2026-07-09 18:56:05', 2, NULL),
+(7, 'Bâ', 'Mariama', 'm.ba@suptech.edu', '$2y$10$htrucilqBHqUa75/XWaz/eyzaDrfwqYHEbhJys4Sp4ayo5wcb.gzG', 'actif', '2026-07-09 18:56:05', 2, NULL),
+(8, 'Sembène', 'Ousmane', 'o.sembene@suptech.edu', '$2y$10$EODKGrm0U/MZktUMUXsBEuX2WUT7.3tGC5mtiWI00kwXZiKGCecqW', 'actif', '2026-07-09 18:56:05', 2, NULL),
+(9, 'Sow Fall', 'Aminata', 'a.sowfall@suptech.edu', '$2y$10$BjrXYT4hewsqbufyL3a9..6.ZztKE5B9u4e2dMIcVoXARoxbHhiI2', 'actif', '2026-07-09 18:56:05', 2, NULL),
+(10, 'Senghor', 'Léopold', 'l.senghor@suptech.edu', '$2y$10$7VpeDJ.zQ8Y7ymcInW8zieocd5/3oNxeana9eMxBE9W7jsXHU7zRe', 'actif', '2026-07-09 18:56:05', 2, NULL),
+(11, 'Diome', 'Fatou', 'f.diome@suptech.edu', '$2y$10$AR6tYcLQD9fW3j6QOmPOFewc3kqX6IR5XGIFqg4yvqFhwCu6n68FS', 'actif', '2026-07-09 18:56:05', 2, NULL),
+(12, 'Diop_B', 'Boubacar Boris', 'b.diop@suptech.edu', '$2y$10$zHpK6tI0uOBEZhoik01mdux5GtrdxOQ89MDSQj8GXRXOGEGHZ9kHW', 'actif', '2026-07-09 18:56:05', 2, NULL),
+(13, 'Bugul', 'Ken', 'k.bugul@suptech.edu', '$2y$10$Arr8j7YoKcsArZRR6izRQ.cSWDjxJg4tdMymn713Ex/hXol6oawCS', 'actif', '2026-07-09 18:56:05', 2, NULL),
+(14, 'Sarr', 'Felwine', 'f.sarr@suptech.edu', '$2y$10$bI.l6JNDAym5gw.KipWWAexRXAUU1kPGQ5dCwqbj7H8P/61ODXP.e', 'actif', '2026-07-09 18:56:05', 2, NULL),
+(15, 'Sylla', 'Khady', 'k.sylla@suptech.edu', '$2y$10$mabot88iPeNuIlx4op3ls.v3YJBlMFDpt7Ff4jIoX59dVs71k9Wg.', 'actif', '2026-07-09 18:56:05', 2, NULL),
+(16, 'ly', 'mamad', 'mamad@gmail.com', '$2y$10$cTQD0IVdddteQBWlFJ8m9ONXlIkxfrfYvH3J7rJsQ0XDN/R.vMram', 'actif', '2026-07-10 15:45:01', 3, NULL);
 
 --
 -- Contraintes pour les tables déchargées
